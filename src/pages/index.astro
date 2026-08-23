@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import IntroWordmark from '../components/IntroWordmark.astro';
+import ProjectStack from '../components/ProjectStack.astro';
+import Footer from '../components/Footer.astro';
+import { projects } from '../data/projects';
+---
+
+<Layout title="Sonia — Design + Development">
+	<Nav />
+	<main>
+		<IntroWordmark
+			name="Sonia"
+			bio="Independent designer and developer focused on brand identity and digital interfaces. I collaborate with studios and brands on projects spanning branding to frontend."
+		/>
+		<ProjectStack projects={projects} />
+		<Footer />
+	</main>
+</Layout>

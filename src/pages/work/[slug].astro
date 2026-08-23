@@ -1,0 +1,294 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import { projects } from '../../data/projects';
+
+export function getStaticPaths() {
+	return projects.map((project, i) => ({
+		params: { slug: project.slug },
+		props: { project, next: projects[(i + 1) % projects.length] },
+	}));
+}
+
+const { project, next } = Astro.props;
+---
+
+<Layout title={`${project.name} — Sonia`} description={project.summary}>
+	<Nav back={{ href: '/#work', label: '← Back' }} />
+	<main class="case">
+		<header class="case__header">
+			<span class="eyebrow">Case study</span>
+			<h1 class="case__title">{project.name}</h1>
+			<p class="case__summary">{project.summary}</p>
+
+			<dl class="case__meta">
+				<div>
+					<dt>Client</dt>
+					<dd>{project.client}</dd>
+				</div>
+				<div>
+					<dt>Role</dt>
+					<dd>{project.role}</dd>
+				</div>
+				<div>
+					<dt>Year</dt>
+					<dd>{project.year}</dd>
+				</div>
+				<div>
+					<dt>Tools</dt>
+					<dd>{project.tools}</dd>
+				</div>
+			</dl>
+		</header>
+
+		{
+			project.images ? (
+				<div class="case__cover case__cover--image" style={`background:${project.color}`}>
+					<img src={project.images.cover} alt={`${project.name} app screen`} />
+				</div>
+			) : (
+				<div class="case__cover" style={`background:${project.color}`}>
+					<span style={`color:${project.nameColor}`}>Project cover image</span>
+				</div>
+			)
+		}
+
+		<section class="case__section">
+			<span class="eyebrow" style="--lime: var(--lime-text)">The challenge</span>
+			<p class="case__lead">{project.challenge}</p>
+		</section>
+
+		<section class="case__section">
+			<span class="eyebrow" style="--lime: var(--lime-text)">The process</span>
+			<p class="case__body">{project.process}</p>
+			<div class="case__gallery" style={project.images ? `grid-template-columns: repeat(${project.images.process.length}, 1fr)` : undefined}>
+				{
+					project.images ? (
+						project.images.process.map((src) => (
+							<div class="case__placeholder case__placeholder--image" style={`background:${project.color}`}>
+								<img src={src} alt={`${project.name} process screen`} />
+							</div>
+						))
+					) : (
+						<>
+							<div class="case__placeholder">Process image 1</div>
+							<div class="case__placeholder">Process image 2</div>
+						</>
+					)
+				}
+			</div>
+		</section>
+
+		{
+			project.extraSections?.map((section) => (
+				<section class="case__section">
+					<span class="eyebrow" style="--lime: var(--lime-text)">{section.title}</span>
+					<p class="case__body">{section.description}</p>
+					{section.video ? (
+						<div class="case__video">
+							<video src={section.video} autoplay muted loop playsinline />
+						</div>
+					) : (
+						<div class="case__gallery case__gallery--wide">
+							{section.images?.map((src) => (
+								<div class="case__placeholder case__placeholder--wide-image" style={`background:${project.color}`}>
+									<img src={src} alt={section.title} />
+								</div>
+							))}
+						</div>
+					)}
+				</section>
+			))
+		}
+
+		<section class="case__section">
+			<span class="eyebrow" style="--lime: var(--lime-text)">The result</span>
+			<p class="case__lead">{project.result}</p>
+			{!project.images && <div class="case__placeholder case__placeholder--wide">Final / result image</div>}
+		</section>
+
+		<footer class="case__footer">
+			<span class="eyebrow" style="--lime: var(--lime-text)">Next project</span>
+			<a href={`/work/${next.slug}`} class="case__next">{next.name} →</a>
+		</footer>
+	</main>
+</Layout>
+
+<style>
+	.case {
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 140px var(--margin) 100px;
+	}
+
+	.case__title {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: clamp(48px, 8vw, 84px);
+		letter-spacing: -0.03em;
+		margin: 16px 0 20px;
+	}
+
+	.case__summary {
+		font-size: 19px;
+		color: var(--gray);
+		max-width: 620px;
+		line-height: 1.45;
+		margin: 0 0 56px;
+	}
+
+	.case__meta {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 24px;
+		padding-bottom: 48px;
+		border-bottom: 1px solid var(--border);
+		margin: 0 0 64px;
+	}
+
+	.case__meta dt {
+		font-size: 11.5px;
+		font-weight: 500;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--gray);
+		margin-bottom: 6px;
+	}
+
+	.case__meta dd {
+		margin: 0;
+		font-size: 15.5px;
+		font-weight: 500;
+	}
+
+	.case__cover {
+		height: 60vh;
+		border-radius: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 14px;
+		font-weight: 500;
+		margin-bottom: 96px;
+	}
+
+	.case__cover--image img {
+		height: 88%;
+		width: auto;
+		object-fit: contain;
+		border-radius: 20px;
+	}
+
+	.case__section {
+		margin-bottom: 80px;
+	}
+
+	.case__lead {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: clamp(22px, 3vw, 28px);
+		letter-spacing: -0.01em;
+		line-height: 1.35;
+		max-width: 760px;
+		margin: 20px 0 0;
+	}
+
+	.case__body {
+		font-size: 17px;
+		color: var(--gray);
+		line-height: 1.5;
+		max-width: 700px;
+		margin: 20px 0 0;
+	}
+
+	.case__gallery {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 40px;
+		margin-top: 32px;
+	}
+
+	.case__video {
+		margin-top: 32px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		/* true black, matching the phone bezel/letterboxing baked into the
+		   recordings themselves — var(--ink) is a dark gray and left a visible seam */
+		background: #000;
+		border-radius: 20px;
+		padding: 32px;
+		min-height: 380px;
+	}
+
+	.case__video video {
+		max-height: 560px;
+		max-width: 100%;
+		width: auto;
+		height: auto;
+		border-radius: 12px;
+	}
+
+	.case__placeholder {
+		height: 380px;
+		border-radius: 20px;
+		background: #ececec;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 13px;
+		color: var(--gray);
+	}
+
+	.case__placeholder--image img {
+		height: 90%;
+		width: auto;
+		object-fit: contain;
+		border-radius: 20px;
+	}
+
+	.case__placeholder--wide {
+		height: 340px;
+		margin-top: 32px;
+	}
+
+	.case__gallery--wide {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.case__placeholder--wide-image {
+		height: auto;
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+	}
+
+	.case__placeholder--wide-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: top;
+		border-radius: 20px;
+	}
+
+	.case__footer {
+		border-top: 1px solid var(--border);
+		padding-top: 40px;
+	}
+
+	.case__next {
+		display: block;
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: clamp(28px, 4vw, 34px);
+		margin-top: 12px;
+	}
+
+	@media (max-width: 720px) {
+		.case__meta {
+			grid-template-columns: repeat(2, 1fr);
+		}
+		.case__gallery {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

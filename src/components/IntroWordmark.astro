@@ -1,0 +1,112 @@
+---
+interface Props {
+	name: string;
+	bio: string;
+}
+const { name, bio } = Astro.props;
+const letters = name.split('');
+---
+
+<section class="intro-stack" style={`height: ${(letters.length + 1) * 100}svh`}>
+	<div class="intro-stack__layer intro-stack__bio" style="z-index: 0">
+		<p class="intro__bio">{bio}</p>
+		<div class="intro__meta">
+			<span>Portfolio 2026</span>
+			<span class="intro__scroll">Scroll ↓</span>
+		</div>
+	</div>
+	{
+		letters.map((letter, i) => {
+			// spread letters left-to-right in reading order, each in its own
+			// slot, so as they accumulate on scroll they spell the name
+			// instead of piling up on just two repeating positions
+			const fraction = letters.length > 1 ? i / (letters.length - 1) : 0;
+			const leftPct = 10 + fraction * 68;
+			return (
+				<div class="intro-stack__layer letters__slot" style={`z-index: ${i + 1}`}>
+					<span class="letters__char" style={`left: ${leftPct}%`}>
+						{letter}
+					</span>
+				</div>
+			);
+		})
+	}
+</section>
+
+<style>
+	/* the bio sticks first (visible immediately, from scroll 0) and stays
+	   pinned; each letter is a later sibling with a higher z-index, so as
+	   you scroll it slides in and covers whatever sticks beneath it */
+	.intro-stack {
+		position: relative;
+	}
+
+	.intro-stack__layer {
+		position: sticky;
+		top: 0;
+		height: 100svh;
+	}
+
+	.intro-stack__bio {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding: 0 var(--margin);
+		/* the only opaque layer here — everything scrolling on top of it
+		   (the letters) is transparent, so this stays visible underneath
+		   until the first solid project card finally covers it */
+		background: var(--white);
+	}
+
+	.letters__slot {
+		/* position: sticky (and its stacking context) comes from
+		   .intro-stack__layer — this class must NOT redeclare `position`,
+		   or it overrides the sticky rule and the letters stop pinning */
+		background: transparent;
+	}
+
+	.letters__char {
+		position: absolute;
+		/* top-aligned, not bottom: the NEXT letter's box slides up into view
+		   from the bottom as you scroll, so content sitting near the bottom
+		   edge gets covered almost immediately — keeping it near the top
+		   gives it a full, readable dwell time before the next one arrives */
+		top: 18vh;
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(56px, 10vw, 160px);
+		line-height: 1;
+		letter-spacing: -0.03em;
+	}
+
+	.intro__bio {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: clamp(20px, 3vw, 34px);
+		letter-spacing: -0.01em;
+		line-height: 1.25;
+		max-width: 900px;
+		color: var(--ink);
+		margin: 0;
+	}
+
+	.intro__meta {
+		position: absolute;
+		bottom: 40px;
+		left: var(--margin);
+		right: var(--margin);
+		display: flex;
+		justify-content: space-between;
+		font-size: 13px;
+		color: var(--gray);
+	}
+
+	@media (max-width: 640px) {
+		.letters__char {
+			font-size: clamp(40px, 16vw, 80px);
+		}
+		.intro__meta {
+			bottom: 24px;
+		}
+	}
+</style>

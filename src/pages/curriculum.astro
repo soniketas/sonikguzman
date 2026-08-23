@@ -1,0 +1,279 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+const experience = [
+	{
+		date: 'Since March 2025',
+		title: 'UX/UI Web Designer',
+		place: 'novosafe',
+		tag: 'Freelance',
+		description:
+			'B2B security platform for multi-location businesses. Designed the company\'s first website in Framer and the MVP of the security dashboard app, both originally built for individual customers. After the pivot to B2B: ongoing redesign of the app experience in Figma for chain retailers and energy-facility operators.',
+	},
+	{
+		date: 'Feb 2024 – Dec 2024',
+		title: 'UX/UI Web Designer',
+		place: 'arbo',
+		tag: null,
+		description:
+			'AI-powered material analysis. Built an AI-powered tool to automatically extract bills of materials (BOM) from construction plans, plus step-by-step guides for complex workflows. Built a scalable design system with Tailwind CSS and Anima for consistent, faster implementation in React.',
+	},
+	{
+		date: '',
+		title: 'Checkout redesign',
+		place: 'greta stefanel',
+		tag: 'WordPress · E-commerce',
+		description: 'Direct PayPal checkout redesign to increase conversion rate.',
+	},
+	{
+		date: '',
+		title: 'Sustainable water management platform',
+		place: 'IPE systeme',
+		tag: 'WordPress',
+		description: 'Accessible platform for navigation and data comprehension.',
+	},
+	{
+		date: '',
+		title: 'E-commerce redesign',
+		place: 'dwa kolory',
+		tag: 'Webflow',
+		description: 'Mobile-first strategy to optimize Instagram-driven traffic.',
+	},
+];
+
+const education = [
+	{ date: '2024', title: 'UX/UI Design Bootcamp', place: 'Ironhack Berlin' },
+	{ date: '2021–2023', title: 'Master in Motion Design', place: 'Design School of Barcelona' },
+	{ date: '2015–2017', title: 'Higher Technician in Post-Production', place: 'Centrum Comenius Valencia' },
+	{ date: '2011–2015', title: 'Media Communication', place: 'University of Valencia' },
+];
+---
+
+<Layout title="Curriculum — Sonia Guzman" description="Sonia Guzman's experience, skills, and tools.">
+	<Nav back={{ href: '/', label: '← Back' }} />
+	<main class="cv">
+		<header class="cv__header">
+			<span class="eyebrow">Curriculum</span>
+			<h1 class="cv__title">Sonia Guzman</h1>
+			<p class="cv__role">UX/UI Designer &middot; Web Designer</p>
+			<div class="cv__contact">
+				<span>Berlin, Germany</span>
+			</div>
+			<a href="/cv.pdf" download class="cv__download">Download PDF ↓</a>
+		</header>
+
+		<section class="cv__section">
+			<h2 class="cv__section-title">Experience</h2>
+			<ol class="timeline">
+				{
+					experience.map((item) => (
+						<li class="timeline__item">
+							<span class="timeline__dot" />
+							{item.date && <span class="timeline__date">{item.date}</span>}
+							<p class="timeline__title">
+								{item.title} <span class="timeline__place">— {item.place}</span>
+							</p>
+							{item.tag && <span class="pill timeline__tag">{item.tag}</span>}
+							<p class="timeline__desc">{item.description}</p>
+						</li>
+					))
+				}
+			</ol>
+		</section>
+
+		<section class="cv__section">
+			<h2 class="cv__section-title">Education</h2>
+			<ol class="timeline">
+				{
+					education.map((item) => (
+						<li class="timeline__item">
+							<span class="timeline__dot" />
+							<span class="timeline__date">{item.date}</span>
+							<p class="timeline__title">{item.title}</p>
+							<p class="timeline__desc">{item.place}</p>
+						</li>
+					))
+				}
+			</ol>
+		</section>
+
+		<section class="cv__section">
+			<h2 class="cv__section-title">Skills &amp; languages</h2>
+			<div class="cv__skills">
+				<div>
+					<h3>Design practice</h3>
+					<p>Design thinking, user research, prototyping &amp; wireframing, UI design, iterative design process</p>
+				</div>
+				<div>
+					<h3>Design &amp; web tools</h3>
+					<p>Figma, Framer, Illustrator, Claude Code, Photoshop, Webflow, Notion, Tailwind CSS, Anima, React</p>
+				</div>
+				<div>
+					<h3>Languages</h3>
+					<p>Spanish (native), English (C1), German (B2)</p>
+				</div>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>
+
+<style>
+	.cv {
+		max-width: 1000px;
+		margin: 0 auto;
+		padding: 140px var(--margin) 100px;
+	}
+
+	.cv__title {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: clamp(48px, 8vw, 96px);
+		letter-spacing: -0.03em;
+		margin: 16px 0 4px;
+	}
+
+	.cv__role {
+		font-size: 19px;
+		color: var(--gray);
+		margin: 0 0 20px;
+	}
+
+	.cv__contact {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 20px;
+		font-size: 14px;
+		color: var(--gray);
+		margin-bottom: 28px;
+	}
+
+	.cv__contact a {
+		color: var(--ink);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	.cv__download {
+		display: inline-flex;
+		align-items: center;
+		padding: 12px 24px;
+		background: var(--ink);
+		color: var(--white);
+		border-radius: 30px;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.cv__section {
+		margin-top: 88px;
+		padding-top: 40px;
+		border-top: 1px solid var(--border);
+	}
+
+	.cv__section-title {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: clamp(26px, 4vw, 36px);
+		letter-spacing: -0.02em;
+		margin: 0 0 48px;
+	}
+
+	/* --- vertical timeline --- */
+	.timeline {
+		position: relative;
+		list-style: none;
+		margin: 0;
+		padding: 0 0 0 32px;
+	}
+
+	.timeline::before {
+		content: '';
+		position: absolute;
+		top: 6px;
+		bottom: 6px;
+		left: 5px;
+		width: 1px;
+		background: var(--border);
+	}
+
+	.timeline__item {
+		position: relative;
+		padding-bottom: 48px;
+	}
+
+	.timeline__item:last-child {
+		padding-bottom: 0;
+	}
+
+	.timeline__dot {
+		position: absolute;
+		top: 6px;
+		left: -32px;
+		width: 11px;
+		height: 11px;
+		border-radius: 50%;
+		background: var(--lime);
+		border: 2px solid var(--white);
+		box-shadow: 0 0 0 1px var(--lime);
+	}
+
+	.timeline__date {
+		display: block;
+		font-size: 13px;
+		color: var(--gray);
+		margin-bottom: 6px;
+	}
+
+	.timeline__title {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 22px;
+		margin: 0 0 4px;
+	}
+
+	.timeline__place {
+		font-weight: 400;
+		color: var(--gray);
+	}
+
+	.timeline__tag {
+		margin-bottom: 10px;
+	}
+
+	.timeline__desc {
+		font-size: 15.5px;
+		color: var(--gray);
+		line-height: 1.55;
+		max-width: 620px;
+		margin: 10px 0 0;
+	}
+
+	.cv__skills {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 40px;
+	}
+
+	.cv__skills h3 {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 20px;
+		margin: 0 0 12px;
+	}
+
+	.cv__skills p {
+		font-size: 15px;
+		color: var(--gray);
+		line-height: 1.5;
+		margin: 0;
+	}
+
+	@media (max-width: 720px) {
+		.cv__skills {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

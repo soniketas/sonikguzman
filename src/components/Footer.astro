@@ -1,0 +1,64 @@
+---
+---
+
+<footer class="footer" id="contact">
+	<a href="mailto:sonia.guzman.19@gmail.com" class="footer__cta">Let's work together →</a>
+	<div class="footer__bottom">
+		<a href="mailto:sonia.guzman.19@gmail.com" class="footer__email">Email me →</a>
+		<div class="footer__social">
+			<a href="#">Instagram</a>
+			<a href="https://linkedin.com/in/soniaguz19" target="_blank" rel="noopener">LinkedIn</a>
+			<a href="#">GitHub</a>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.footer {
+		position: relative;
+		z-index: 999;
+		min-height: 100vh;
+		background: var(--ink);
+		color: var(--white);
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: 80px var(--margin) 48px;
+	}
+
+	.footer__cta {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(36px, 7vw, 88px);
+		letter-spacing: -0.03em;
+		max-width: 900px;
+	}
+
+	.footer__bottom {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 24px;
+	}
+
+	.footer__email {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: clamp(20px, 3vw, 32px);
+	}
+
+	.footer__social {
+		display: flex;
+		gap: 28px;
+		font-size: 13px;
+		font-weight: 500;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: rgb(255 255 255 / 65%);
+	}
+
+	.footer__social a:hover {
+		color: var(--lime);
+	}
+</style>

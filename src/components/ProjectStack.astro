@@ -1,0 +1,129 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+	projects: Project[];
+}
+const { projects } = Astro.props;
+
+// pick a readable muted color for the index/year labels based on how dark
+// the card background is — a fixed black-at-50% only reads on light cards
+function mutedTextColor(hex: string): string {
+	const c = hex.replace('#', '');
+	const r = parseInt(c.slice(0, 2), 16);
+	const g = parseInt(c.slice(2, 4), 16);
+	const b = parseInt(c.slice(4, 6), 16);
+	const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+	return luminance > 0.6 ? 'rgb(0 0 0 / 50%)' : 'rgb(255 255 255 / 60%)';
+}
+---
+
+<section class="stack" id="work">
+	{
+		projects.map((project, i) => {
+			const mutedColor = mutedTextColor(project.color);
+			return (
+				<a
+					href={`/work/${project.slug}`}
+					class="stack__card"
+					style={`
+						background: ${project.color};
+						z-index: ${i + 1};
+						--inset: ${i * 3}vw;
+					`}
+				>
+					<div class="stack__inner">
+						<span class="stack__index" style={`color: ${mutedColor}`}>
+							{String(i + 1).padStart(2, '0')}
+						</span>
+						<h2 class="stack__name" style={`color: ${project.nameColor}`}>
+							{project.name}
+						</h2>
+						<div class="stack__meta">
+							<span class="pill">{project.category}</span>
+							<span class="stack__year" style={`color: ${mutedColor}`}>
+								{project.year}
+							</span>
+						</div>
+					</div>
+				</a>
+			);
+		})
+	}
+</section>
+
+<style>
+	.stack {
+		position: relative;
+	}
+
+	.stack__card {
+		position: sticky;
+		top: 0;
+		display: block;
+		/* svh (not vh) so mobile browsers with a collapsing address bar don't
+		   clip content or force extra scroll to reach the label */
+		height: 100svh;
+		/* each card is inset a bit more than the last, so the one underneath
+		   peeks out at the edges — the "stacked cards" illusion */
+		padding: calc(4vw + var(--inset)) calc(4vw + var(--inset));
+		overflow: hidden;
+	}
+
+	.stack__inner {
+		position: relative;
+		height: 100%;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		/* top-aligned: the next card slides up from the bottom as you scroll,
+		   so bottom-aligned content gets covered before it's fully readable */
+		justify-content: flex-start;
+		padding: 18vh 48px 48px;
+	}
+
+	.stack__index {
+		position: absolute;
+		top: 48px;
+		left: 48px;
+		font-family: var(--font-body);
+		font-size: 13px;
+	}
+
+	.stack__name {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(40px, 7vw, 96px);
+		letter-spacing: -0.03em;
+		line-height: 1;
+		margin: 0 0 20px;
+	}
+
+	.stack__meta {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.stack__year {
+		font-size: 14px;
+	}
+
+	@media (max-width: 640px) {
+		.stack__card {
+			/* insets barely scale on mobile — on a narrow screen the full
+			   3vw-per-card growth eats too much width for the label to read */
+			padding: calc(16px + var(--inset) * 0.15);
+		}
+		.stack__inner {
+			padding: 15vh 20px 20px;
+		}
+		.stack__name {
+			font-size: clamp(32px, 9vw, 56px);
+		}
+		.stack__index {
+			top: 20px;
+			left: 20px;
+		}
+	}
+</style>

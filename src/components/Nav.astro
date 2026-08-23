@@ -1,0 +1,203 @@
+---
+interface Props {
+	back?: { href: string; label: string };
+}
+const { back } = Astro.props;
+---
+
+<nav class="nav">
+	<a href="/" class="nav__logo">
+		<span class="nav__dot"></span>
+		<span class="nav__logo-text">SONIA</span>
+	</a>
+	{
+		back ? (
+			<a href={back.href} class="nav__back">
+				{back.label}
+			</a>
+		) : (
+			<>
+				<div class="nav__links">
+					<a href="/curriculum">Curriculum</a>
+					<a href="/#contact">Contact</a>
+				</div>
+				<button class="nav__hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-menu">
+					<span></span>
+					<span></span>
+				</button>
+			</>
+		)
+	}
+</nav>
+
+{
+	!back && (
+		<div class="nav__mobile-menu" id="nav-mobile-menu">
+			<a href="/curriculum">Curriculum</a>
+			<a href="/#contact">Contact</a>
+		</div>
+	)
+}
+
+<style>
+	.nav {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 100;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 20px var(--margin);
+		background: rgb(255 255 255 / 70%);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+	}
+
+	.nav__logo-text,
+	.nav__links,
+	.nav__back {
+		color: var(--ink);
+	}
+
+	.nav__logo {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 17px;
+		letter-spacing: 0.05em;
+	}
+
+	.nav__dot {
+		width: 8px;
+		height: 8px;
+		background: var(--lime);
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.nav__links {
+		display: flex;
+		gap: 36px;
+		font-size: 12.5px;
+		font-weight: 500;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.nav__back {
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.nav__hamburger {
+		display: none;
+		flex-direction: column;
+		justify-content: center;
+		align-items: flex-end;
+		gap: 6px;
+		width: 32px;
+		height: 32px;
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		z-index: 101;
+	}
+
+	.nav__hamburger span {
+		display: block;
+		height: 2px;
+		background: var(--ink);
+		transition: transform 0.25s ease, opacity 0.25s ease, width 0.25s ease;
+	}
+
+	.nav__hamburger span:first-child {
+		width: 22px;
+	}
+
+	.nav__hamburger span:last-child {
+		width: 14px;
+	}
+
+	.nav__hamburger[aria-expanded='true'] span {
+		width: 22px;
+	}
+
+	.nav__hamburger[aria-expanded='true'] span:first-child {
+		transform: translateY(4px) rotate(45deg);
+	}
+
+	.nav__hamburger[aria-expanded='true'] span:last-child {
+		transform: translateY(-4px) rotate(-45deg);
+	}
+
+	.nav__mobile-menu {
+		position: fixed;
+		inset: 0;
+		z-index: 99;
+		background: var(--white);
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 32px;
+		padding: 0 var(--margin);
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-12px);
+		transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+	}
+
+	.nav__mobile-menu.is-open {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+	}
+
+	.nav__mobile-menu a {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 15vw;
+		letter-spacing: -0.02em;
+		color: var(--ink);
+	}
+
+	@media (max-width: 640px) {
+		.nav__links {
+			display: none;
+		}
+		.nav__hamburger {
+			display: flex;
+		}
+	}
+
+	@media (min-width: 641px) {
+		.nav__mobile-menu {
+			display: none;
+		}
+	}
+</style>
+
+<script>
+	const hamburger = document.getElementById('nav-hamburger');
+	const menu = document.getElementById('nav-mobile-menu');
+
+	if (hamburger && menu) {
+		hamburger.addEventListener('click', () => {
+			const isOpen = menu.classList.toggle('is-open');
+			hamburger.setAttribute('aria-expanded', String(isOpen));
+			document.body.style.overflow = isOpen ? 'hidden' : '';
+		});
+
+		menu.querySelectorAll('a').forEach((link) => {
+			link.addEventListener('click', () => {
+				menu.classList.remove('is-open');
+				hamburger.setAttribute('aria-expanded', 'false');
+				document.body.style.overflow = '';
+			});
+		});
+	}
+</script>
