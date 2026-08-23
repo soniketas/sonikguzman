@@ -21,10 +21,11 @@ const letters = name.split('');
 			// slot, so as they accumulate on scroll they spell the name
 			// instead of piling up on just two repeating positions
 			const fraction = letters.length > 1 ? i / (letters.length - 1) : 0;
-			const leftPct = 10 + fraction * 68;
+			const leftPct = 30 + fraction * 32;
+				const tilt = Math.sin(i * 2.4 + 1) * 6;
 			return (
 				<div class="intro-stack__layer letters__slot" style={`z-index: ${i + 1}`}>
-					<span class="letters__char" style={`left: ${leftPct}%`}>
+					<span class="letters__char" style={`left: ${leftPct}%; rotate: ${tilt.toFixed(1)}deg`}>
 						{letter}
 					</span>
 				</div>
@@ -74,7 +75,7 @@ const letters = name.split('');
 		top: 18vh;
 		font-family: var(--font-display);
 		font-weight: 700;
-		font-size: clamp(56px, 10vw, 160px);
+		font-size: clamp(44px, 8vw, 130px);
 		line-height: 1;
 		letter-spacing: -0.03em;
 	}
@@ -103,7 +104,7 @@ const letters = name.split('');
 
 	@media (max-width: 640px) {
 		.letters__char {
-			font-size: clamp(40px, 16vw, 80px);
+			font-size: clamp(32px, 13vw, 64px);
 		}
 		.intro__meta {
 			bottom: 24px;
