@@ -113,7 +113,7 @@ export const projects: Project[] = [
 		nameColor: '#7fd1de',
 		images: {
 			cover: '/images/ipe-systeme/cover.png',
-			process: ['/images/ipe-systeme/methodology.png', '/images/ipe-systeme/awards.png'],
+			process: ['/images/ipe-systeme/methodology.png', '/images/ipe-systeme/intro.png'],
 		},
 	},
 	{
