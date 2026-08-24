@@ -94,22 +94,27 @@ export const projects: Project[] = [
 		],
 	},
 	{
-		slug: 'arca-type',
-		name: 'Arca Type',
-		category: 'Design System',
-		year: '2024',
-		client: 'Arca',
-		role: 'Design System + Documentation',
-		tools: 'Figma, Storybook, Tokens Studio',
-		summary: 'A scalable design system for a growing product team.',
+		slug: 'ipe-systeme',
+		name: 'IPE Systeme',
+		category: 'Sustainability · Water Management',
+		year: '2023',
+		client: 'IPE Systeme',
+		role: 'UX/UI Web Designer (Freelance)',
+		tools: 'WordPress, Elementor, Astra',
+		summary:
+			"A WordPress site for a patented water-saving system, turning a technical sustainability product into a clear, credible lead-generation experience.",
 		challenge:
-			'Multiple teams were building inconsistent interfaces with no single source of truth for components.',
+			"IPE Systeme's patented water-injection system cuts a building's water and energy consumption, backed by real international recognition — a Silver Medal at Switzerland's International Exhibition of Inventions, a 2022 LABGRADE nomination in Italy, among others. But the technology itself is hard to explain simply. The site needed to build trust fast and turn visits into requests for a free water audit, without burying visitors in technical detail.",
 		process:
-			'Audited existing components, defined design tokens, and built living documentation in Storybook.',
+			"I structured the site around four clear stops: home, about (the company's 15-year history and its real accolades), services (the installation broken into three concrete steps — reception & analysis, water study, installation), and contact. Built in WordPress with Elementor and the Astra theme, with the 'free water audit' request form kept one click away on every page.",
 		result:
-			'New feature delivery time cut by 35% thanks to reusable components.',
-		color: '#161616',
-		nameColor: '#ffffff',
+			"The site is IPE Systeme's live digital presence, presenting its patented system and real international awards through a simple structure built around a single conversion goal: getting visitors to request their water audit.",
+		color: '#454F5E',
+		nameColor: '#7fd1de',
+		images: {
+			cover: '/images/ipe-systeme/cover.png',
+			process: ['/images/ipe-systeme/methodology.png', '/images/ipe-systeme/awards.png'],
+		},
 	},
 	{
 		slug: 'lumen',
