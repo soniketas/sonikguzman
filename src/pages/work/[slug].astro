@@ -13,7 +13,7 @@ export function getStaticPaths() {
 const { project, next } = Astro.props;
 ---
 
-<Layout title={`${project.name} — Sonia`} description={project.summary}>
+<Layout title={`${project.name} · Sonia`} description={project.summary}>
 	<Nav back={{ href: '/#work', label: '← Back' }} />
 	<main class="case">
 		<header class="case__header">
@@ -65,7 +65,14 @@ const { project, next } = Astro.props;
 				{
 					project.images ? (
 						project.images.process.map((src) => (
-							<div class="case__placeholder case__placeholder--image" style={`background:${project.color}`}>
+							<div
+								class:list={[
+									'case__placeholder',
+									'case__placeholder--image',
+									project.images?.processFit === 'contain' && 'case__placeholder--contain',
+								]}
+								style={`background:${project.color}`}
+							>
 								<img src={src} alt={`${project.name} process screen`} />
 							</div>
 						))
@@ -252,6 +259,23 @@ const { project, next } = Astro.props;
 		object-fit: cover;
 		object-position: top;
 		border-radius: 20px;
+	}
+
+	/* for portrait screenshots (e.g. phone UI) — a landscape cover-crop
+	   would cut most of the image off, so show it whole instead */
+	.case__placeholder--contain {
+		height: 480px;
+		aspect-ratio: auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.case__placeholder--contain img {
+		width: auto;
+		height: 90%;
+		object-fit: contain;
+		object-position: center;
 	}
 
 	.case__placeholder--wide {
