@@ -240,10 +240,17 @@ const { project, next } = Astro.props;
 		color: var(--gray);
 	}
 
+	.case__placeholder--image {
+		height: auto;
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+	}
+
 	.case__placeholder--image img {
-		height: 90%;
-		width: auto;
-		object-fit: contain;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: top;
 		border-radius: 20px;
 	}
 
@@ -291,17 +298,15 @@ const { project, next } = Astro.props;
 			grid-template-columns: 1fr;
 		}
 
-		/* drop the colored frame around real screenshots on mobile —
+		/* drop the colored frame around the cover screenshot on mobile —
 		   it eats into space the image could use on a small screen */
-		.case__cover--image,
-		.case__placeholder--image {
+		.case__cover--image {
 			background: transparent;
 			height: auto;
 			border-radius: 0;
 		}
 
-		.case__cover--image img,
-		.case__placeholder--image img {
+		.case__cover--image img {
 			width: 100%;
 			height: auto;
 			border-radius: 0;
