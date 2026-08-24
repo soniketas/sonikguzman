@@ -61,7 +61,7 @@ const { project, next } = Astro.props;
 		<section class="case__section">
 			<span class="eyebrow" style="--lime: var(--lime-text)">The process</span>
 			<p class="case__body">{project.process}</p>
-			<div class="case__gallery" style={project.images ? `grid-template-columns: repeat(${project.images.process.length}, 1fr)` : undefined}>
+			<div class="case__gallery" style={project.images ? `--gallery-cols: ${project.images.process.length}` : undefined}>
 				{
 					project.images ? (
 						project.images.process.map((src) => (
@@ -203,7 +203,7 @@ const { project, next } = Astro.props;
 
 	.case__gallery {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(var(--gallery-cols, 2), 1fr);
 		gap: 40px;
 		margin-top: 32px;
 	}
@@ -289,6 +289,22 @@ const { project, next } = Astro.props;
 		}
 		.case__gallery {
 			grid-template-columns: 1fr;
+		}
+
+		/* drop the colored frame around real screenshots on mobile —
+		   it eats into space the image could use on a small screen */
+		.case__cover--image,
+		.case__placeholder--image {
+			background: transparent;
+			height: auto;
+			border-radius: 0;
+		}
+
+		.case__cover--image img,
+		.case__placeholder--image img {
+			width: 100%;
+			height: auto;
+			border-radius: 0;
 		}
 	}
 </style>
