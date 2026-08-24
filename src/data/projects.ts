@@ -117,21 +117,27 @@ export const projects: Project[] = [
 		},
 	},
 	{
-		slug: 'lumen',
-		name: 'Lumen',
-		category: 'SaaS Dashboard',
+		slug: 'greta-stefanel',
+		name: 'Greta Stefanel',
+		category: 'E-commerce · Checkout Redesign',
 		year: '2024',
-		client: 'Lumen',
-		role: 'UI Design + Frontend',
-		tools: 'Figma, Vue, D3.js',
-		summary: 'Real-time analytics dashboard for a B2B SaaS product.',
+		client: 'Greta Stefanel',
+		role: 'UX/UI Web Designer (Freelance)',
+		tools: 'WordPress, WooCommerce',
+		summary:
+			'A nature- and folklore-inspired art shop, redesigned around clear product categories and a direct checkout path for single-item purchases.',
 		challenge:
-			"Users were overwhelmed by the volume of available data and couldn't find what mattered quickly.",
+			"Greta Stefanel sells handmade, nature-inspired pieces across five very different categories — accessories, interior prints, wooden pins, holographic stickers, art prints. Browsing needed to make that range easy to scan at a glance, and buying a single art print shouldn't require the same multi-step basket flow as a multi-item order.",
 		process:
-			'Visual hierarchy built around real user tasks, with prototyped data visualizations.',
-		result: 'Time to first meaningful insight cut from 4 minutes to 45 seconds.',
-		color: '#fdeecb',
-		nameColor: '#b8790a',
+			"I redesigned the homepage around a bold, image-led Categories grid — each of the five categories gets a full-bleed photo with its name overlaid, so the range of what's sold is legible in one scroll. On product pages, I added a direct PayPal buy option next to 'Add to basket', so a customer buying one print can check out without detouring through the basket at all. Built in WordPress with WooCommerce.",
+		result:
+			"The categories grid and direct-checkout option are live on gretastefanel.com today, shortening the path from a single product page straight to payment.",
+		color: '#697861',
+		nameColor: '#fffcea',
+		images: {
+			cover: '/images/greta-stefanel/cover.png',
+			process: ['/images/greta-stefanel/categories.png', '/images/greta-stefanel/checkout.png'],
+		},
 	},
 	{
 		slug: 'reto-personal',
