@@ -140,22 +140,26 @@ export const projects: Project[] = [
 		},
 	},
 	{
-		slug: 'reto-personal',
-		name: 'Personal Challenge',
-		category: 'UI Experiment',
-		year: '2023',
+		slug: 'runup',
+		name: 'RunUp',
+		category: 'Bar Inventory · PWA',
+		year: '2026',
 		client: 'Personal project',
-		role: 'Design + Development',
-		tools: 'Figma, Three.js',
+		role: 'Product Design + Development',
+		tools: 'React, Vite, Tailwind CSS',
 		summary:
-			'A personal experiment exploring 3D interactions in the browser for a conceptual portfolio.',
+			'An installable PWA that lets bar runners see restock status at a glance and generates an accurate shopping list from the deposit.',
 		challenge:
-			'I wanted to learn how to combine WebGL with traditional interfaces without sacrificing performance.',
+			"Bars track fridge and shelf stock informally, so runners waste time re-checking what's actually missing and how much, shift after shift. When the deposit doesn't have enough of something, that shortage tends to get lost the moment the next shift starts.",
 		process:
-			'Rapid prototype iteration, with performance optimization for mobile devices.',
+			"I built RunUp as a single-page installable PWA with no backend — everything lives in one state hook and persists to the device's local storage. Each fridge or shelf is a 'zone' with its own products and ideal stock levels; the home screen shows what's empty, low, or full at a glance, and a picking list is generated automatically, grouped by zone, of exactly what to bring from the deposit. Critically, the app distinguishes between stock a runner actually restocked and a real deposit shortage, so gaps stay visible instead of quietly resetting at the next shift.",
 		result:
-			'A working prototype that became the foundation for several pieces of my current portfolio.',
-		color: '#f3d6d6',
-		nameColor: '#a12b2b',
+			"RunUp is currently being tested by real runners during service at a bar — an active pilot, not just a prototype.",
+		color: '#e7f158',
+		nameColor: '#181611',
+		images: {
+			cover: '/images/runup/home.png',
+			process: ['/images/runup/zone.png', '/images/runup/picking.png'],
+		},
 	},
 ];
