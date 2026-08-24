@@ -261,8 +261,10 @@ const { project, next } = Astro.props;
 		border-radius: 20px;
 	}
 
-	/* for portrait screenshots (e.g. phone UI) — a landscape cover-crop
-	   would cut most of the image off, so show it whole instead */
+	/* for screenshots whose aspect ratio doesn't suit a landscape cover-crop
+	   (e.g. portrait phone UI, or a wide dashboard screenshot): a cover-crop
+	   would cut content off, so show the whole image, letterboxed on the
+	   project's brand color, instead */
 	.case__placeholder--contain {
 		height: 480px;
 		aspect-ratio: auto;
@@ -272,8 +274,10 @@ const { project, next } = Astro.props;
 	}
 
 	.case__placeholder--contain img {
+		max-width: 90%;
+		max-height: 90%;
 		width: auto;
-		height: 90%;
+		height: auto;
 		object-fit: contain;
 		object-position: center;
 	}

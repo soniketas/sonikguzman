@@ -144,6 +144,29 @@ export const projects: Project[] = [
 		},
 	},
 	{
+		slug: 'dwa-kolory',
+		name: 'Dwa Kolory',
+		category: 'E-commerce · Mobile-First Redesign',
+		year: '2024',
+		client: 'Dwa Kolory',
+		role: 'UX/UI Web Designer (Freelance)',
+		tools: 'Webflow',
+		summary:
+			'A mobile-first redesign for a Ukrainian heritage concept store, built to carry its Instagram-driven traffic straight into an easy shop.',
+		challenge:
+			"Dwa Kolory sells handmade goods, crochet, embroidery, jewelry, candles, rooted in Ukrainian heritage, and most of its discovery happens on Instagram. Visitors were arriving from a feed built entirely around product photography, on their phones, so the shop needed to match that experience instead of forcing them onto a desktop-first layout.",
+		process:
+			"I rebuilt the site in Webflow with a mobile-first layout: a simple category grid (accessories, clothing, jewelry, candles) up front, each category represented by the same kind of strong product photography the brand already uses on Instagram, and a short path from a product photo to checkout.",
+		result:
+			"The redesigned store is live at dwakoloryua.com, carrying Dwa Kolory's Instagram-first product photography into a shop that works the way its actual traffic arrives: on mobile.",
+		color: '#26509e',
+		nameColor: '#f0c814',
+		images: {
+			cover: '/images/dwa-kolory/cover.png',
+			process: ['/images/dwa-kolory/category.png', '/images/dwa-kolory/product.png'],
+		},
+	},
+	{
 		slug: 'runup',
 		name: 'RunUp',
 		category: 'Bar Inventory · PWA',
@@ -164,6 +187,7 @@ export const projects: Project[] = [
 		images: {
 			cover: '/images/runup/home.png',
 			process: ['/images/runup/zone.png', '/images/runup/picking.png'],
+			processFit: 'contain',
 		},
 	},
 ];
