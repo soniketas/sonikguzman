@@ -6,16 +6,20 @@ import { projects } from '../../data/projects';
 export function getStaticPaths() {
 	return projects.map((project, i) => ({
 		params: { slug: project.slug },
-		props: { project, next: projects[(i + 1) % projects.length] },
+		props: {
+			project,
+			next: projects[(i + 1) % projects.length],
+			prev: projects[(i - 1 + projects.length) % projects.length],
+		},
 	}));
 }
 
-const { project, next } = Astro.props;
+const { project, next, prev } = Astro.props;
 ---
 
 <Layout title={`${project.name} · Sonia`} description={project.summary}>
 	<Nav back={{ href: '/#work', label: '← Back' }} />
-	<main class="case">
+	<main class="case" id="main-content">
 		<header class="case__header">
 			<span class="eyebrow">Case study</span>
 			<h1 class="case__title">{project.name}</h1>
@@ -115,8 +119,14 @@ const { project, next } = Astro.props;
 		</section>
 
 		<footer class="case__footer">
-			<span class="eyebrow" style="--lime: var(--lime-text)">Next project</span>
-			<a href={`/work/${next.slug}`} class="case__next">{next.name} →</a>
+			<a href={`/work/${prev.slug}`} class="case__nav-link case__nav-link--prev" aria-label={`Previous project: ${prev.name}`}>
+				<span class="eyebrow" style="--lime: var(--lime-text)">← Previous</span>
+				<span class="case__nav-name">{prev.name}</span>
+			</a>
+			<a href={`/work/${next.slug}`} class="case__nav-link case__nav-link--next" aria-label={`Next project: ${next.name}`}>
+				<span class="eyebrow" style="--lime: var(--lime-text)">Next →</span>
+				<span class="case__nav-name">{next.name}</span>
+			</a>
 		</footer>
 	</main>
 </Layout>
@@ -308,14 +318,27 @@ const { project, next } = Astro.props;
 	.case__footer {
 		border-top: 1px solid var(--border);
 		padding-top: 40px;
+		display: flex;
+		justify-content: space-between;
+		gap: 24px;
+		flex-wrap: wrap;
 	}
 
-	.case__next {
-		display: block;
+	.case__nav-link {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.case__nav-link--next {
+		text-align: right;
+		align-items: flex-end;
+	}
+
+	.case__nav-name {
 		font-family: var(--font-display);
 		font-weight: 500;
 		font-size: clamp(28px, 4vw, 34px);
-		margin-top: 12px;
 	}
 
 	@media (max-width: 720px) {
@@ -324,6 +347,15 @@ const { project, next } = Astro.props;
 		}
 		.case__gallery {
 			grid-template-columns: 1fr;
+		}
+
+		.case__footer {
+			flex-direction: column;
+		}
+
+		.case__nav-link--next {
+			text-align: left;
+			align-items: flex-start;
 		}
 
 		/* drop the colored frame around the cover screenshot on mobile —

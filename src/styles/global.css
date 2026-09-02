@@ -47,6 +47,17 @@ img {
 	display: block;
 }
 
+/* double-ring focus indicator: the ink ring gives contrast on light
+   backgrounds, the lime ring gives contrast on dark/colored ones (project
+   cards, footer) — between the two, at least one always shows clearly */
+a:focus-visible,
+button:focus-visible {
+	outline: 2px solid var(--ink);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 5px var(--lime);
+	border-radius: 2px;
+}
+
 .eyebrow {
 	font-size: 12.5px;
 	font-weight: 500;
