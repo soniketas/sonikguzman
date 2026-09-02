@@ -13,8 +13,8 @@ export interface Project {
 	color: string; // stack card background
 	nameColor: string; // project name overlay color
 	images?: {
-		cover: string;
-		process: string[];
+		cover: { src: string; alt: string };
+		process: { src: string; alt: string }[];
 		// 'contain' for portrait screenshots (e.g. phone UI) that would
 		// otherwise get cropped by the gallery's default landscape cover-crop
 		processFit?: 'cover' | 'contain';
@@ -22,8 +22,10 @@ export interface Project {
 	extraSections?: {
 		title: string;
 		description: string;
-		images?: string[];
-		video?: string;
+		images?: { src: string; alt: string }[];
+		// controls: adds a minimal pause/play button — reserve for videos long
+		// enough (WCAG 2.2.2, >5s) that autoplay-loop needs a way to stop
+		video?: { src: string; description: string; controls?: boolean };
 	}[];
 }
 
@@ -47,8 +49,20 @@ export const projects: Project[] = [
 		color: '#13294b',
 		nameColor: '#8fb8ff',
 		images: {
-			cover: '/images/novosafe/home.png',
-			process: ['/images/novosafe/home.png', '/images/novosafe/locations.png'],
+			cover: {
+				src: '/images/novosafe/home.webp',
+				alt: "Novosafe app home screen showing an armed status message, a Berlin store location, and a large arm/disarm control with an SOS button.",
+			},
+			process: [
+				{
+					src: '/images/novosafe/home.webp',
+					alt: "Novosafe app home screen showing an armed status message, a Berlin store location, and a large arm/disarm control with an SOS button.",
+				},
+				{
+					src: '/images/novosafe/locations.webp',
+					alt: 'Novosafe app locations list for a chain retailer, showing 44 sites with individual arm/disarm toggles, search, and filters.',
+				},
+			],
 			processFit: 'contain',
 		},
 		extraSections: [
@@ -56,13 +70,22 @@ export const projects: Project[] = [
 				title: 'The original consumer app',
 				description:
 					'Before the B2B pivot, I designed the MVP for individual homeowners: device monitoring with live status, and on-demand snapshots from any connected sensor or camera.',
-				video: '/images/novosafe/b2c-snapshot-demo.mp4',
+				video: {
+					src: '/images/novosafe/b2c-snapshot-demo.mp4',
+					description:
+						"Screen recording of the consumer app requesting an on-demand snapshot from a motion sensor and showing its signal and battery strength.",
+					controls: true,
+				},
 			},
 			{
 				title: 'The marketing website',
 				description:
 					"I also designed novosafe's first website in Framer, built around two entry points: one for homes, one for businesses. That business side reflected an earlier, different B2B concept than the one the app has since pivoted to.",
-				video: '/images/novosafe/website-toggle-demo.mp4',
+				video: {
+					src: '/images/novosafe/website-toggle-demo.mp4',
+					description:
+						"Screen recording of the novosafe marketing website stepping through numbered content panels over a photo of a house exterior.",
+				},
 			},
 		],
 	},
@@ -85,15 +108,36 @@ export const projects: Project[] = [
 		color: '#dcecc9',
 		nameColor: '#4c7a1f',
 		images: {
-			cover: '/images/arbo/cover.png',
-			process: ['/images/arbo/client-upload.png', '/images/arbo/specialist-offers.png'],
+			cover: {
+				src: '/images/arbo/cover.webp',
+				alt: "Arbo login screen on a laptop, with a 'Welcome to Arbo' panel introducing Avi, Arbo's AI, next to the email and password fields.",
+			},
+			process: [
+				{
+					src: '/images/arbo/client-upload.webp',
+					alt: 'Arbo client request flow: a file-upload step for timber lists, specifications, and structural calculations, with a four-step progress tracker.',
+				},
+				{
+					src: '/images/arbo/specialist-offers.webp',
+					alt: "Arbo internal operations dashboard listing supplier offers for an order, grouped by status with requested, approved, rejected, and pending counts.",
+				},
+			],
 		},
 		extraSections: [
 			{
 				title: 'A further exploration: an AI structure editor',
 				description:
 					"Beyond the shipped flow, I explored a more ambitious redesign: a 3D structure editor where AI would flag reliability issues, like beam collisions, directly on the model before a request was ever sent to a supplier. It didn't make it to production, but it shaped how I think about surfacing AI confidence and errors inside complex technical interfaces.",
-				images: ['/images/arbo/exploration-ai-editor.png', '/images/arbo/exploration-step-guide.png'],
+				images: [
+					{
+						src: '/images/arbo/exploration-ai-editor.webp',
+						alt: 'AI document-analysis loading screen, extracting material data from an uploaded plan at 76% complete.',
+					},
+					{
+						src: '/images/arbo/exploration-step-guide.webp',
+						alt: 'Exploratory 3D structure editor showing a timber roof frame from four angles, with an AI-flagged collision error between a support beam and a crossbeam.',
+					},
+				],
 			},
 		],
 	},
@@ -116,8 +160,20 @@ export const projects: Project[] = [
 		color: '#454F5E',
 		nameColor: '#7fd1de',
 		images: {
-			cover: '/images/ipe-systeme/cover.png',
-			process: ['/images/ipe-systeme/methodology.png', '/images/ipe-systeme/intro.png'],
+			cover: {
+				src: '/images/ipe-systeme/cover.webp',
+				alt: "IPE Systeme homepage hero over an aerial river landscape photo, with the headline 'Juntos, somos más sostenibles' and a call to request a free water audit.",
+			},
+			process: [
+				{
+					src: '/images/ipe-systeme/methodology.webp',
+					alt: "IPE Systeme's three-step methodology section: reception and analysis, water study, and system installation.",
+				},
+				{
+					src: '/images/ipe-systeme/intro.webp',
+					alt: "IPE Systeme introduction section describing the patented water-injection system's savings, next to a forest lake photo and icons for implementation, consultancy, and monitoring.",
+				},
+			],
 		},
 	},
 	{
@@ -139,8 +195,20 @@ export const projects: Project[] = [
 		color: '#697861',
 		nameColor: '#fffcea',
 		images: {
-			cover: '/images/greta-stefanel/cover.png',
-			process: ['/images/greta-stefanel/categories.png', '/images/greta-stefanel/checkout.png'],
+			cover: {
+				src: '/images/greta-stefanel/cover.webp',
+				alt: "Phone mockup of the Greta Stefanel shop's Categories page, with the Accessories tile shown over a textile scarf photo.",
+			},
+			process: [
+				{
+					src: '/images/greta-stefanel/categories.webp',
+					alt: 'Greta Stefanel shop Categories grid with full-bleed photos for the Accessories and Stickers categories.',
+				},
+				{
+					src: '/images/greta-stefanel/checkout.webp',
+					alt: "Two phones showing a Greta Stefanel product page for a Ritual Fabric Print, with a quantity selector, 'Add to basket', and a direct PayPal buy option.",
+				},
+			],
 		},
 	},
 	{
@@ -162,8 +230,20 @@ export const projects: Project[] = [
 		color: '#26509e',
 		nameColor: '#f0c814',
 		images: {
-			cover: '/images/dwa-kolory/cover.png',
-			process: ['/images/dwa-kolory/category.png', '/images/dwa-kolory/product.png'],
+			cover: {
+				src: '/images/dwa-kolory/cover.webp',
+				alt: 'Dwa Kolory homepage with a wheat field hero photo and a category row for accessories, candles, and clothes.',
+			},
+			process: [
+				{
+					src: '/images/dwa-kolory/category.webp',
+					alt: 'Dwa Kolory accessories category grid of crochet keychains, including a pumpkin, sunflower, bird, and cat, each with its price.',
+				},
+				{
+					src: '/images/dwa-kolory/product.webp',
+					alt: 'Dwa Kolory product page for a crochet pumpkin keychain, priced at €10 and marked out of stock.',
+				},
+			],
 		},
 	},
 	{
@@ -185,8 +265,20 @@ export const projects: Project[] = [
 		color: '#e7f158',
 		nameColor: '#181611',
 		images: {
-			cover: '/images/runup/home.png',
-			process: ['/images/runup/zone.png', '/images/runup/picking.png'],
+			cover: {
+				src: '/images/runup/home.webp',
+				alt: "RunUp home screen showing today's shift stock status: 1 empty, 8 low, 8 full, and a restock breakdown by zone.",
+			},
+			process: [
+				{
+					src: '/images/runup/zone.webp',
+					alt: 'RunUp zone view for Refrigerador 1, listing individual drinks with stock sliders from empty to full.',
+				},
+				{
+					src: '/images/runup/picking.webp',
+					alt: 'RunUp picking list grouped by zone, with a checkbox for each product still needed from the deposit.',
+				},
+			],
 			processFit: 'contain',
 		},
 	},
