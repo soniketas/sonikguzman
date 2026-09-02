@@ -61,6 +61,11 @@ function mutedTextColor(hex: string): string {
 		position: sticky;
 		top: 0;
 		display: block;
+		/* forces GPU layer promotion so the browser composites this on
+		   scroll instead of repainting the covered card underneath —
+		   position: sticky isn't always auto-promoted, and repaint on
+		   every scroll frame was tanking FPS */
+		will-change: transform;
 		/* svh (not vh) so mobile browsers with a collapsing address bar don't
 		   clip content or force extra scroll to reach the label */
 		height: 100svh;

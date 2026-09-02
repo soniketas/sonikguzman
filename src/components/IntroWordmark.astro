@@ -46,6 +46,10 @@ const letters = name.split('');
 		position: sticky;
 		top: 0;
 		height: 100svh;
+		/* forces GPU layer promotion so the browser composites this on
+		   scroll instead of repainting the layer underneath — same fix
+		   as .stack__card, see ProjectStack.astro */
+		will-change: transform;
 	}
 
 	.intro-stack__bio {
