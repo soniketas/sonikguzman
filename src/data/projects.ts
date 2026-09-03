@@ -106,7 +106,7 @@ export const projects: Project[] = [
 		result:
 			"The AI-assisted request flow replaced a manual, email-based process with a single upload-to-quote flow, reviewable by both the client and Arbo's team before it ever reached a supplier.",
 		color: '#dcecc9',
-		nameColor: '#4c7a1f',
+		nameColor: '#456e1c',
 		images: {
 			cover: {
 				src: '/images/arbo/cover.webp',

@@ -5,50 +5,36 @@ interface Props {
 	projects: Project[];
 }
 const { projects } = Astro.props;
-
-// pick a readable muted color for the index/year labels based on how dark
-// the card background is — a fixed black-at-50% only reads on light cards
-function mutedTextColor(hex: string): string {
-	const c = hex.replace('#', '');
-	const r = parseInt(c.slice(0, 2), 16);
-	const g = parseInt(c.slice(2, 4), 16);
-	const b = parseInt(c.slice(4, 6), 16);
-	const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-	return luminance > 0.6 ? 'rgb(0 0 0 / 50%)' : 'rgb(255 255 255 / 60%)';
-}
 ---
 
 <section class="stack" id="work">
 	{
-		projects.map((project, i) => {
-			const mutedColor = mutedTextColor(project.color);
-			return (
-				<a
-					href={`/work/${project.slug}`}
-					class="stack__card"
-					style={`
-						background: ${project.color};
-						z-index: ${i + 1};
-						--inset: ${i * 3}vw;
-					`}
-				>
-					<div class="stack__inner">
-						<span class="stack__index" style={`color: ${mutedColor}`}>
-							{String(i + 1).padStart(2, '0')}
+		projects.map((project, i) => (
+			<a
+				href={`/work/${project.slug}`}
+				class="stack__card"
+				style={`
+					background: ${project.color};
+					z-index: ${i + 1};
+					--inset: ${i * 3}vw;
+				`}
+			>
+				<div class="stack__inner">
+					<span class="stack__index" style={`color: ${project.nameColor}`}>
+						{String(i + 1).padStart(2, '0')}
+					</span>
+					<h2 class="stack__name" style={`color: ${project.nameColor}`}>
+						{project.name}
+					</h2>
+					<div class="stack__meta">
+						<span class="pill">{project.category}</span>
+						<span class="stack__year" style={`color: ${project.nameColor}`}>
+							{project.year}
 						</span>
-						<h2 class="stack__name" style={`color: ${project.nameColor}`}>
-							{project.name}
-						</h2>
-						<div class="stack__meta">
-							<span class="pill">{project.category}</span>
-							<span class="stack__year" style={`color: ${mutedColor}`}>
-								{project.year}
-							</span>
-						</div>
 					</div>
-				</a>
-			);
-		})
+				</div>
+			</a>
+		))
 	}
 </section>
 
