@@ -85,6 +85,7 @@ export const projects: Project[] = [
 					src: '/images/novosafe/website-toggle-demo.mp4',
 					description:
 						"Screen recording of the novosafe marketing website stepping through numbered content panels over a photo of a house exterior.",
+					controls: true,
 				},
 			},
 		],
