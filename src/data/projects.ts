@@ -91,6 +91,59 @@ export const projects: Project[] = [
 		],
 	},
 	{
+		slug: 'novosafe-shop',
+		name: 'Novosafe',
+		category: 'E-commerce · Direct Sales',
+		year: '2025',
+		client: 'novosafe',
+		role: 'UX/UI Web Designer (Freelance)',
+		tools: 'Shopify',
+		summary:
+			'A Shopify store built for novosafe to sell its Ajax-powered security packages directly online, designed and built but never launched publicly.',
+		challenge:
+			"Alongside the B2B app redesign, novosafe asked me to explore what a direct-to-consumer sales channel could look like: a store where individual customers could buy a ready-made security package without going through a sales call first.",
+		process:
+			"I built the store in Shopify around four package tiers (Wohnung or Haus, Basic or Premium), each itemized with its exact contents, hub, sirens, keypad, sensors, so a buyer knows precisely what arrives. For anyone still unsure before purchasing, a persistent call banner and a WhatsApp button offer a quick conversation, alongside a standard cart and checkout flow.",
+		result:
+			"The exploration resulted in a fully working store, from browsing a package to checkout, though it was always an open exploration rather than a committed launch, and it never went live publicly.",
+		color: '#3d5877',
+		nameColor: '#bcd9f2',
+		images: {
+			cover: {
+				src: '/images/novosafe-shop/cover.webp',
+				alt: "Novosafe Shopify store homepage with the headline 'Smarte Sicherheit. Fairer Preis.' over an Ajax security kit, and a four-step buying guide below.",
+			},
+			process: [
+				{
+					src: '/images/novosafe-shop/packages.webp',
+					alt: 'Novosafe Shopify store showing four security packages: Wohnung Basic, Wohnung Premium, Haus Basic, and Haus Premium, each with its price.',
+				},
+				{
+					src: '/images/novosafe-shop/product-detail.webp',
+					alt: "Novosafe Shopify product page for the Wohnung Premium Pack, with a banner reading 'Unsicher? Ein kurzer Anruf, klare Antworten' and a phone number above the product gallery.",
+				},
+			],
+			processFit: 'contain',
+		},
+		extraSections: [
+			{
+				title: 'From cart to checkout',
+				description:
+					"The store included a full purchase flow: an itemized cart breaking down every component in a package, and a standard Shopify checkout for delivery and payment.",
+				images: [
+					{
+						src: '/images/novosafe-shop/cart.webp',
+						alt: 'Novosafe Shopify cart drawer listing the Wohnung Premium Pack and its individual components: Ajax Button, Hub, Siren, Tags, and door sensor.',
+					},
+					{
+						src: '/images/novosafe-shop/checkout.webp',
+						alt: 'Novosafe Shopify checkout page with contact and delivery address fields next to an order summary totaling 332,00 €.',
+					},
+				],
+			},
+		],
+	},
+	{
 		slug: 'arbo',
 		name: 'Arbo',
 		category: 'Materials Platform · AI',
