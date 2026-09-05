@@ -486,6 +486,21 @@ const dims = new Map(
 			height: auto;
 			border-radius: 0;
 		}
+
+		/* same problem as the cover above, but for letterboxed gallery images:
+		   a fixed 480px box makes a wide screenshot render tiny with a huge
+		   colored frame around it on a narrow screen — let the image set its
+		   own height at full width instead */
+		.case__placeholder--contain {
+			height: auto;
+		}
+
+		.case__placeholder--contain img {
+			max-width: 100%;
+			max-height: none;
+			width: 100%;
+			height: auto;
+		}
 	}
 </style>
 
