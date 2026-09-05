@@ -94,25 +94,36 @@ const dims = new Map(
 			<div class="case__gallery" style={project.images ? `--gallery-cols: ${project.images.process.length}` : undefined}>
 				{
 					project.images ? (
-						project.images.process.map((image) => (
-							<div
-								class:list={[
-									'case__placeholder',
-									'case__placeholder--image',
-									project.images?.processFit === 'contain' && 'case__placeholder--contain',
-								]}
-								style={`background:${project.color}`}
-							>
-								<img
-									src={image.src}
-									alt={image.alt}
-									width={dims.get(image.src)?.width}
-									height={dims.get(image.src)?.height}
-									loading="lazy"
-									decoding="async"
-								/>
-							</div>
-						))
+						project.images.process.map((image) => {
+							const isContain = project.images?.processFit === 'contain';
+							// contain is for screenshots too wide/tall for a 16:10 cover-crop.
+							// A phone screenshot (portrait) still reads best centered in a
+							// framed box; a desktop/web screenshot (landscape) doesn't need a
+							// frame at all, on any screen size — screenshots of web pages
+							// elsewhere in the site never use one, only phone UI does.
+							const isPhone = isContain && (dims.get(image.src)?.height ?? 0) > (dims.get(image.src)?.width ?? 0);
+							const isWide = isContain && !isPhone;
+							return (
+								<div
+									class:list={[
+										'case__placeholder',
+										'case__placeholder--image',
+										isPhone && 'case__placeholder--contain-phone',
+										isWide && 'case__placeholder--contain-wide',
+									]}
+									style={isWide ? undefined : `background:${project.color}`}
+								>
+									<img
+										src={image.src}
+										alt={image.alt}
+										width={dims.get(image.src)?.width}
+										height={dims.get(image.src)?.height}
+										loading="lazy"
+										decoding="async"
+									/>
+								</div>
+							);
+						})
 					) : (
 						<>
 							<div class="case__placeholder">Process image 1</div>
@@ -386,11 +397,12 @@ const dims = new Map(
 		border-radius: 20px;
 	}
 
-	/* for screenshots whose aspect ratio doesn't suit a landscape cover-crop
-	   (e.g. portrait phone UI, or a wide dashboard screenshot): a cover-crop
-	   would cut content off, so show the whole image, letterboxed on the
-	   project's brand color, instead */
-	.case__placeholder--contain {
+	/* for screenshots whose aspect ratio doesn't suit a landscape cover-crop:
+	   a cover-crop would cut content off, so show the whole image instead.
+	   Phone UI (portrait) reads best centered in a framed box; a desktop/web
+	   screenshot (landscape) gets no frame at all, matching every other web
+	   screenshot on the site. */
+	.case__placeholder--contain-phone {
 		height: 480px;
 		aspect-ratio: auto;
 		display: flex;
@@ -398,13 +410,23 @@ const dims = new Map(
 		justify-content: center;
 	}
 
-	.case__placeholder--contain img {
+	.case__placeholder--contain-phone img {
 		max-width: 90%;
 		max-height: 90%;
 		width: auto;
 		height: auto;
 		object-fit: contain;
 		object-position: center;
+	}
+
+	.case__placeholder--contain-wide {
+		height: auto;
+		background: transparent;
+	}
+
+	.case__placeholder--contain-wide img {
+		width: 100%;
+		height: auto;
 	}
 
 	.case__placeholder--wide {
@@ -487,15 +509,16 @@ const dims = new Map(
 			border-radius: 0;
 		}
 
-		/* same problem as the cover above, but for letterboxed gallery images:
-		   a fixed 480px box makes a wide screenshot render tiny with a huge
+		/* same problem as the cover above, but for framed phone screenshots:
+		   a fixed 480px box makes a portrait screenshot render tiny with a
 		   colored frame around it on a narrow screen — let the image set its
-		   own height at full width instead */
-		.case__placeholder--contain {
+		   own height at full width instead. (--contain-wide has no frame on
+		   any screen size, so it needs no override here.) */
+		.case__placeholder--contain-phone {
 			height: auto;
 		}
 
-		.case__placeholder--contain img {
+		.case__placeholder--contain-phone img {
 			max-width: 100%;
 			max-height: none;
 			width: 100%;
