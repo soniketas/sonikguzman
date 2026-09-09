@@ -80,7 +80,7 @@ export const projects: Project[] = [
 			{
 				title: 'The marketing website',
 				description:
-					"I also designed novosafe's first website in Framer, built around two entry points: one for homes, one for businesses. That business side reflected an earlier, different B2B concept than the one the app has since pivoted to.",
+					"I also designed novosafe's first website in Framer, built around two entry points: one for homes, one for businesses. That business side reflected an earlier, different B2B concept than the one the app has since pivoted to. As a parallel lead-generation initiative, I ran two channel-specific campaigns, one for a community platform (nebenan.de) and one for a national newspaper (FAZ), each testing a channel-matched landing variant against a generic one. In the nebenan.de campaign, the channel-matched design outperformed the generic version: 4.17% vs. 0% conversion (small sample, 47 visits).",
 				video: {
 					src: '/images/novosafe/website-toggle-demo.mp4',
 					description:
@@ -158,7 +158,7 @@ export const projects: Project[] = [
 		process:
 			"The platform has two very different sides. Clients get a simple, guided request flow: upload your plans, and Avi (Arbo's AI) extracts the material list automatically, reviewable before it's sent anywhere. Internally, Arbo's specialists work from a denser operations dashboard: matching requests with consulted suppliers, comparing incoming offers, and managing accounts across three roles (Admin, Expert, Supplier). I designed both sides on a shared design system built with Tailwind CSS and Anima, so the specialist and client screens stayed visually consistent while serving very different needs.",
 		result:
-			"The AI-assisted request flow replaced a manual, email-based process with a single upload-to-quote flow, reviewable by both the client and Arbo's team before it ever reached a supplier.",
+			"The AI-assisted request flow replaced a manual, email-based process with a single upload-to-quote flow, reviewable by both the client and Arbo's team before it ever reached a supplier. Automated a process that previously required manually cross-referencing multi-page construction plans, freeing engineers to focus on validation instead of data entry.",
 		color: '#dcecc9',
 		nameColor: '#456e1c',
 		images: {
@@ -245,7 +245,7 @@ export const projects: Project[] = [
 		process:
 			"I redesigned the homepage around a bold, image-led Categories grid: each of the five categories gets a full-bleed photo with its name overlaid, so the range of what's sold is legible in one scroll. On product pages, I added a direct PayPal buy option next to 'Add to basket', so a customer buying one print can check out without detouring through the basket at all. Built in WordPress with WooCommerce.",
 		result:
-			"The categories grid and direct-checkout option are live on gretastefanel.com today, shortening the path from a single product page straight to payment.",
+			"The categories grid and direct-checkout option are live on gretastefanel.com today, shortening the path from a single product page straight to payment. Redesigned checkout to accept PayPal directly, removing the redirect-and-re-enter-details step that was likely causing drop-off.",
 		color: '#697861',
 		nameColor: '#fffcea',
 		images: {
