@@ -306,16 +306,16 @@ export const projects: Project[] = [
 		category: 'AI Integration · PWA',
 		year: '2026',
 		client: 'Personal project',
-		role: 'Product Design + AI Integration + Development',
-		tools: 'React, Vite, Tailwind CSS, Claude API (vision), Firebase Firestore',
+		role: 'Product Design + Development',
+		tools: 'React, Vite, Tailwind CSS, Firebase, Claude (vision), Vercel',
 		summary:
-			'An installable PWA that lets bar runners see restock status at a glance and generates an accurate shopping list from the deposit.',
+			'A PWA that helps bar staff track stock, restock faster, and now count what\'s on hand from a photo instead of by hand.',
 		challenge:
-			"Bars track fridge and shelf stock informally, so runners waste time re-checking what's actually missing and how much, shift after shift. When the deposit doesn't have enough of something, that shortage tends to get lost the moment the next shift starts.",
+			"Bars usually track stock however works in the moment: a runner's memory, a whiteboard, a spreadsheet nobody keeps current. Everyone ends up recounting the same shelves shift after shift, and no one has a clear read on what's actually there.",
 		process:
-			"I designed and integrated the AI layer myself, not just the surrounding product. A runner photographs a fridge or shelf, and a Claude vision model returns a structured count for every expected product, using tool based output instead of free text so the result is always machine parseable. After comparing a few approaches for the counting problem, I chose calling a vision API directly over training a custom model, since it could be prototyped and validated in a real pilot without a training pipeline, accepting a small serverless function as the one piece of backend needed to keep the API key private. The design decision I care about most here is that the AI's count is never trusted directly: it surfaces on a review screen the runner can adjust bottle by bottle before anything touches real stock, because a wrong automatic count is worse than no automation at all in an inventory context. Alongside this, I built a real time sync layer with Firebase Firestore, so a scan on one runner's phone updates every other device live instead of staying an isolated local copy, which is what actually makes an automated count useful across a shift with more than one runner.",
+			"RunUp splits the bar into zones, one per fridge or shelf, each with a target stock level per product, and builds a restock list automatically, sorted by zone, so a runner knows exactly what to grab from the deposit. Once more than one person started using it on their own phone, I added a small backend, Firestore behind a Vercel function, so stock stays in sync no matter who's updating it. I also added a camera scan: point your phone at a shelf and a vision model reads back how many of each product it sees. Since I was building this solo, going with an existing vision API instead of training a custom model was the practical choice. There was no training data to gather, and it worked on the first test. A runner still confirms the count before it saves, since a crowded shelf can trip the model up.",
 		result:
-			"RunUp is an active pilot at a real bar, not just a prototype. The core picking-list workflow has already been in daily use by runners, and the AI photo count and multi-device sync are now shipped too, with a runner currently testing them on shift.",
+			"Runners use RunUp on shift today, each on their own phone, with the same stock numbers updating live no matter who's holding the camera.",
 		color: '#e7f158',
 		nameColor: '#181611',
 		images: {
@@ -326,7 +326,7 @@ export const projects: Project[] = [
 			process: [
 				{
 					src: '/images/runup/zone.webp',
-					alt: 'RunUp zone view for Refrigerador 1 with an Escanear button that lets a runner photograph the fridge for an AI-generated stock count, above a list of individual drinks with stock sliders from empty to full.',
+					alt: 'RunUp zone view for a fridge with a Scan button that lets a runner photograph it for an AI-generated stock count, above a list of individual drinks with stock sliders from empty to full.',
 				},
 				{
 					src: '/images/runup/picking.webp',
