@@ -321,7 +321,7 @@ export const projects: Project[] = [
 		images: {
 			cover: {
 				src: '/images/runup/home.webp',
-				alt: "RunUp home screen showing today's shift stock status: 1 empty, 8 low, 8 full, and a restock breakdown by zone.",
+				alt: "RunUp home screen showing today's shift stock status: 9 empty, 6 low, 4 complete, and a restock breakdown by zone.",
 			},
 			process: [
 				{
