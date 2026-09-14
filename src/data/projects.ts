@@ -285,20 +285,46 @@ export const projects: Project[] = [
 		nameColor: '#f0c814',
 		images: {
 			cover: {
-				src: '/images/dwa-kolory/cover.webp',
-				alt: 'Dwa Kolory homepage with a wheat field hero photo and a category row for accessories, candles, and clothes.',
+				src: '/images/dwa-kolory/mobile-home.webp',
+				alt: 'Dwa Kolory mobile homepage with a wheat field hero photo above the start of a stacked category row.',
 			},
 			process: [
 				{
-					src: '/images/dwa-kolory/category.webp',
-					alt: 'Dwa Kolory accessories category grid of crochet keychains, including a pumpkin, sunflower, bird, and cat, each with its price.',
+					src: '/images/dwa-kolory/mobile-category.webp',
+					alt: 'Dwa Kolory mobile accessories category page, showing crochet keychains one per row: a pumpkin, out of stock, at the top.',
 				},
 				{
-					src: '/images/dwa-kolory/product.webp',
-					alt: 'Dwa Kolory product page for a crochet pumpkin keychain, priced at €10 and marked out of stock.',
+					src: '/images/dwa-kolory/mobile-product.webp',
+					alt: 'Dwa Kolory mobile product page for a crochet pumpkin keychain, marked out of stock, with expandable description and details sections below.',
 				},
 			],
+			processFit: 'contain',
 		},
+		extraSections: [
+			{
+				title: 'On desktop',
+				description:
+					"The site is built mobile-first since that's how Dwa Kolory's traffic actually arrives from Instagram, but it holds up on a larger screen too: the stacked mobile category list becomes a proper grid, and the same product page gets more breathing room.",
+				images: [
+					{
+						src: '/images/dwa-kolory/desktop-home.webp',
+						alt: 'Dwa Kolory desktop homepage with a wheat field hero photo and a category row for accessories, candles, and clothes.',
+					},
+					{
+						src: '/images/dwa-kolory/desktop-category.webp',
+						alt: 'Dwa Kolory desktop accessories category grid of crochet keychains, including a pumpkin, sunflower, bird, and cat, each with its price.',
+					},
+					{
+						src: '/images/dwa-kolory/desktop-product.webp',
+						alt: 'Dwa Kolory desktop product page for a crochet pumpkin keychain, priced at €10 and marked out of stock.',
+					},
+					{
+						src: '/images/dwa-kolory/desktop-candles.webp',
+						alt: 'Dwa Kolory desktop candles category page, showing two stone-carved candles priced at €70 each.',
+					},
+				],
+			},
+		],
 	},
 	{
 		slug: 'runup',
