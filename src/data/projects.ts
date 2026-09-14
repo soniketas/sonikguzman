@@ -6,6 +6,9 @@ export interface Project {
 	client: string;
 	role: string;
 	tools: string;
+	// Short (~3-5 word) descriptive line for the home grid card — what the
+	// project actually does, not a repeat of the client/company name.
+	tagline: string;
 	summary: string;
 	challenge: string;
 	process: string;
@@ -38,6 +41,7 @@ export const projects: Project[] = [
 		client: 'novosafe',
 		role: 'UX/UI Web Designer (Freelance)',
 		tools: 'Figma, Framer',
+		tagline: 'Security Dashboard Redesign',
 		summary:
 			'A B2B security platform helping multi-location businesses arm, monitor, and manage their sites from one app.',
 		challenge:
@@ -98,6 +102,8 @@ export const projects: Project[] = [
 		client: 'novosafe',
 		role: 'UX/UI Web Designer (Freelance)',
 		tools: 'Shopify',
+		// TEMP placeholder (borrowed from category) — needs Sonia's real tagline
+		tagline: 'Direct-to-Consumer Security Store',
 		summary:
 			'A Shopify store built for novosafe to sell its Ajax-powered security packages directly online, designed and built but never launched publicly.',
 		challenge:
@@ -151,6 +157,7 @@ export const projects: Project[] = [
 		client: 'Arbo',
 		role: 'UX/UI Web Designer',
 		tools: 'Figma, Tailwind CSS, Anima',
+		tagline: 'AI-Assisted Material Sourcing',
 		summary:
 			'A platform connecting construction professionals with timber suppliers, evolved to use AI for extracting material lists directly from building plans.',
 		challenge:
@@ -203,6 +210,7 @@ export const projects: Project[] = [
 		client: 'IPE Systeme',
 		role: 'UX/UI Web Designer (Freelance)',
 		tools: 'WordPress, Elementor, Astra',
+		tagline: 'Website & Accessibility Redesign',
 		summary:
 			"A WordPress site for a patented water-saving system, turning a technical sustainability product into a clear, credible lead-generation experience.",
 		challenge:
@@ -238,6 +246,8 @@ export const projects: Project[] = [
 		client: 'Greta Stefanel',
 		role: 'UX/UI Web Designer (Freelance)',
 		tools: 'WordPress, WooCommerce',
+		// TEMP placeholder (borrowed from category) — needs Sonia's real tagline
+		tagline: 'Single-Item Checkout Redesign',
 		summary:
 			'A nature- and folklore-inspired art shop, redesigned around clear product categories and a direct checkout path for single-item purchases.',
 		challenge:
@@ -273,6 +283,7 @@ export const projects: Project[] = [
 		client: 'Dwa Kolory',
 		role: 'UX/UI Web Designer (Freelance)',
 		tools: 'Webflow',
+		tagline: 'Mobile-First E-Commerce Redesign',
 		summary:
 			'A mobile-first redesign for a Ukrainian heritage concept store, built to carry its Instagram-driven traffic straight into an easy shop.',
 		challenge:
@@ -334,6 +345,7 @@ export const projects: Project[] = [
 		client: 'Personal project',
 		role: 'Product Design + Development',
 		tools: 'React, Vite, Tailwind CSS, Firebase, Claude (vision), Vercel',
+		tagline: 'AI-Assisted Bar Inventory App',
 		summary:
 			'A PWA that helps bar staff track stock, restock faster, and now count what\'s on hand from a photo instead of by hand.',
 		challenge:

@@ -1,20 +1,28 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import IntroWordmark from '../components/IntroWordmark.astro';
-import ProjectStack from '../components/ProjectStack.astro';
-import Footer from '../components/Footer.astro';
+import HomeGrid from '../components/HomeGrid.astro';
 import { projects } from '../data/projects';
 ---
 
-<Layout title="Sonia · Design + Development">
-	<Nav />
+<Layout title="Sonia · Design + Development" bodyClass="home-page">
 	<main id="main-content">
-		<IntroWordmark
-			name="sonik"
-			bio="Independent UX/UI designer and developer who builds with a lighter footprint and designs for everyone, following WCAG accessibility guidelines. I collaborate with studios and brands on projects spanning branding to full digital products."
-		/>
-		<ProjectStack projects={projects} />
-		<Footer />
+		<HomeGrid projects={projects} />
 	</main>
 </Layout>
+
+<style is:global>
+	/* No-scroll single-screen only applies where the grid's hover/wheel/tab
+	   interaction model actually works (see the matching min-width check in
+	   HomeGrid.astro's script). Below that, the grid stacks into one column
+	   and needs normal page scroll to reach every card. */
+	@media (min-width: 901px) {
+		html:has(body.home-page) {
+			height: 100%;
+			overflow: hidden;
+		}
+		body.home-page {
+			height: 100%;
+			overflow: hidden;
+		}
+	}
+</style>

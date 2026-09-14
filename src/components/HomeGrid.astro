@@ -1,0 +1,299 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+	projects: Project[];
+}
+const { projects } = Astro.props;
+---
+
+<div class="home">
+	<nav class="home__nav" aria-label="Secondary">
+		<a href="/curriculum">Curriculum</a>
+		<a href="https://linkedin.com/in/soniaguz19" target="_blank" rel="noopener">LinkedIn</a>
+		<a href="mailto:sonia.guzman.19@gmail.com">Email</a>
+	</nav>
+
+	<header class="home__id">
+		<div class="home__title">
+			<span class="home__dot" aria-hidden="true"></span>
+			<h1 class="home__name">Sonia</h1>
+		</div>
+		<p class="home__bio">
+			Independent UX/UI designer and developer who builds with a lighter footprint and designs for everyone.
+		</p>
+	</header>
+
+	<div class="home__grid" id="home-grid" role="list">
+		{
+			projects.map((project) => (
+				<a
+					href={`/work/${project.slug}`}
+					class="cell"
+					role="listitem"
+					aria-label={`${project.name}, ${project.tagline}, ${project.year}`}
+				>
+					<span class="cell__year">{project.year}</span>
+					<div class="cell__tags">
+						{project.tools.split(',').map((tool) => (
+							<span class="pill cell__tag">{tool.trim()}</span>
+						))}
+					</div>
+					<div class="cell__title">
+						<h2 class="cell__name">{project.name}</h2>
+						<span class="cell__client">{project.tagline}</span>
+					</div>
+				</a>
+			))
+		}
+	</div>
+</div>
+
+<style>
+	.home {
+		height: 100svh;
+		display: grid;
+		grid-template-columns: minmax(200px, 22vw) 1fr;
+		padding: var(--margin);
+		gap: clamp(24px, 4vw, 56px);
+	}
+
+	.home__nav {
+		position: fixed;
+		top: clamp(20px, 3vw, 32px);
+		right: clamp(20px, 4vw, 64px);
+		z-index: 10;
+		display: flex;
+		gap: 24px;
+		font-size: 12px;
+		font-weight: 500;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--gray);
+	}
+
+	.home__nav a:hover,
+	.home__nav a:focus-visible {
+		color: var(--ink);
+	}
+
+	.home__id {
+		position: relative;
+		min-width: 0;
+	}
+
+	/* Both pinned to the same 50% line as the grid's own vertical center
+	   (.home__id spans the same height as .home__grid's row), so the title
+	   sits exactly level with the grid regardless of the bio's height below
+	   it — centering the title+bio block as one unit would instead pull the
+	   title above that line, since the bio adds more weight below it. */
+	.home__title {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		transform: translateY(-50%);
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.home__bio {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		transform: translateY(calc(-50% + 38px));
+	}
+
+	.home__dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--lime);
+		flex-shrink: 0;
+	}
+
+	.home__name {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(28px, 3vw, 40px);
+		letter-spacing: -0.02em;
+		margin: 0;
+	}
+
+	.home__bio {
+		font-size: 14px;
+		line-height: 1.5;
+		color: var(--gray);
+		margin: 0;
+		max-width: 32ch;
+	}
+
+	.home__grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		align-self: center;
+		gap: 1px;
+		background: var(--border);
+		border: 1px solid var(--border);
+	}
+
+	.cell {
+		position: relative;
+		display: block;
+		/* taller than wide, but not as extreme as a plain 4-col / 2-row split
+		   across the full viewport height would force it to be */
+		aspect-ratio: 5 / 7;
+		padding: clamp(16px, 2.2vw, 28px);
+		background: var(--white);
+		color: var(--ink);
+		transition: background 0.18s ease, color 0.18s ease;
+	}
+
+	.cell:hover,
+	.cell.is-active {
+		background: var(--ink);
+		color: var(--white);
+		/* without this, the focus ring's box-shadow on the shared edge with
+		   the next cell in DOM order gets painted over by that sibling,
+		   since plain grid items stack in DOM order, not by who's focused */
+		z-index: 1;
+	}
+
+	.cell:hover .cell__year,
+	.cell.is-active .cell__year,
+	.cell:hover .cell__client,
+	.cell.is-active .cell__client {
+		color: rgb(255 255 255 / 65%);
+	}
+
+	.cell:hover .cell__tag,
+	.cell.is-active .cell__tag {
+		background: var(--white);
+		color: var(--ink);
+	}
+
+	.cell__year {
+		position: absolute;
+		top: clamp(16px, 2.2vw, 28px);
+		right: clamp(16px, 2.2vw, 28px);
+		font-size: 12px;
+		color: var(--gray);
+		font-family: var(--font-body);
+	}
+
+	/* pinned to the same bottom offset in every cell, regardless of how many
+	   tags sit above it and how many lines they wrap to — this is what keeps
+	   every title at the same height across the whole grid */
+	.cell__title {
+		position: absolute;
+		left: clamp(16px, 2.2vw, 28px);
+		right: clamp(16px, 2.2vw, 28px);
+		bottom: clamp(16px, 2.2vw, 28px);
+	}
+
+	.cell__name {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(18px, 2vw, 24px);
+		letter-spacing: -0.01em;
+		line-height: 1.1;
+		margin: 0 0 6px;
+	}
+
+	.cell__client {
+		display: block;
+		font-size: 13px;
+		line-height: 1.35;
+		color: var(--gray);
+		/* reserves space for 2 lines even when the tagline is shorter, so the
+		   name above it lands at the same height in every cell regardless of
+		   how long each tagline happens to be (the block below is bottom
+		   anchored as a whole — see .cell__title) */
+		min-height: calc(13px * 1.35 * 2);
+	}
+
+	.cell__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		/* clears the absolutely-positioned year label in the opposite corner */
+		padding-right: 46px;
+	}
+
+	.cell__tag {
+		padding: 4px 10px;
+		font-size: 9px;
+	}
+
+	@media (max-width: 900px) {
+		.home {
+			height: auto;
+			min-height: 100svh;
+			grid-template-columns: 1fr;
+			padding-top: calc(var(--margin) + 48px);
+		}
+
+		.home__grid {
+			grid-template-columns: 1fr;
+		}
+
+		.cell {
+			padding: 20px;
+		}
+	}
+</style>
+
+<script>
+	const grid = document.getElementById('home-grid');
+	const cells = grid ? Array.from(grid.querySelectorAll<HTMLAnchorElement>('.cell')) : [];
+
+	if (grid && cells.length > 0 && window.matchMedia('(min-width: 901px)').matches) {
+		// No page scrolling on the homepage grid: wheel input moves the
+		// selection between cells instead, the same way Tab does. Hover, Tab,
+		// and wheel all converge on real DOM focus (via focusin below and the
+		// mouseenter handler further down), so exactly one cell is ever
+		// highlighted, never a mouse-hovered one and a wheel-selected one at
+		// the same time, and Enter always works on whichever cell is active.
+		let currentIndex = -1;
+		let lastWheelAt = 0;
+
+		cells.forEach((cell) => {
+			cell.addEventListener('mouseenter', () => cell.focus({ preventScroll: true }));
+		});
+
+		grid.addEventListener(
+			'wheel',
+			(e) => {
+				e.preventDefault();
+				const now = Date.now();
+				if (now - lastWheelAt < 250) return;
+				lastWheelAt = now;
+
+				const active = document.activeElement;
+				const activeIdx = cells.indexOf(active as HTMLAnchorElement);
+				if (activeIdx !== -1) currentIndex = activeIdx;
+
+				const direction = e.deltaY > 0 || e.deltaX > 0 ? 1 : -1;
+				currentIndex = Math.min(cells.length - 1, Math.max(0, currentIndex + direction));
+				cells[currentIndex].focus({ preventScroll: true });
+			},
+			{ passive: false },
+		);
+
+		grid.addEventListener('focusin', (e) => {
+			cells.forEach((c) => c.classList.remove('is-active'));
+			const target = e.target as HTMLElement;
+			if (target.classList.contains('cell')) target.classList.add('is-active');
+		});
+
+		grid.addEventListener('focusout', () => {
+			// only clear if focus is leaving the grid entirely, not moving
+			// from one cell to another within it
+			requestAnimationFrame(() => {
+				if (!grid.contains(document.activeElement)) {
+					cells.forEach((c) => c.classList.remove('is-active'));
+				}
+			});
+		});
+	}
+</script>
