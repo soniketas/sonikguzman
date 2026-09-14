@@ -233,12 +233,52 @@ const { projects } = Astro.props;
 			padding-top: calc(var(--margin) + 48px);
 		}
 
+		/* The desktop version pins .home__title/.home__bio with absolute
+		   positioning so the title lands exactly level with the grid's
+		   center. On mobile .home__id stacks above the grid instead of
+		   beside it, and its own height would collapse to ~0 since both
+		   children are taken out of flow — switch them back to a normal
+		   top-to-bottom flow here. */
+		.home__id {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			min-height: 0;
+		}
+
+		.home__title,
+		.home__bio {
+			position: static;
+			transform: none;
+		}
+
 		.home__grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: repeat(2, 1fr);
+			align-self: auto;
+			margin-top: 32px;
 		}
 
 		.cell {
-			padding: 20px;
+			aspect-ratio: 4 / 5;
+			padding: 16px;
+		}
+
+		.cell__tags {
+			padding-right: 34px;
+		}
+
+		.cell__name {
+			font-size: 16px;
+		}
+
+		.cell__client {
+			font-size: 12px;
+			min-height: calc(12px * 1.35 * 2);
+		}
+
+		.cell__tag {
+			font-size: 8px;
+			padding: 3px 8px;
 		}
 	}
 </style>
