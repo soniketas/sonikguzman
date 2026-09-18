@@ -55,12 +55,11 @@ const education = [
 	<Nav back={{ href: '/', label: '← Back' }} />
 	<main class="cv" id="main-content">
 		<header class="cv__header">
-			<span class="eyebrow">Curriculum</span>
-			<h1 class="cv__title">Sonia Guzman</h1>
-			<p class="cv__role">UX/UI Designer &middot; Web Designer</p>
-			<div class="cv__contact">
-				<span>Berlin, Germany</span>
+			<div class="cv__meta-row">
+				<span class="cv__label">[ Curriculum ]</span>
+				<span class="cv__label cv__label--right">UX/UI Designer &middot; Web Designer — Berlin, Germany</span>
 			</div>
+			<h1 class="cv__title">Sonia Guzman</h1>
 			<a href="/cv.pdf" download class="cv__download">Download PDF ↓</a>
 		</header>
 
@@ -127,33 +126,38 @@ const education = [
 		padding: 140px var(--margin) 100px;
 	}
 
-	.cv__title {
-		font-family: var(--font-display);
-		font-weight: 500;
-		font-size: clamp(48px, 8vw, 96px);
-		letter-spacing: -0.03em;
-		margin: 16px 0 4px;
-	}
-
-	.cv__role {
-		font-size: 19px;
-		color: var(--gray);
-		margin: 0 0 20px;
-	}
-
-	.cv__contact {
+	/* Editorial touches borrowed from the reference: a huge serif display
+	   name (their signature trait — "Instrument Serif" is literally what
+	   they use) instead of our usual sans display font, and a monospace
+	   bracketed label pattern ("[ Curriculum ]") for the meta row, in
+	   place of the plain lime-dot eyebrow this page had before. */
+	.cv__meta-row {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 8px 20px;
-		font-size: 14px;
-		color: var(--gray);
-		margin-bottom: 28px;
+		justify-content: space-between;
+		gap: 8px 24px;
+		margin-bottom: 8px;
 	}
 
-	.cv__contact a {
-		color: var(--ink);
-		text-decoration: underline;
-		text-underline-offset: 3px;
+	.cv__label {
+		font-family: 'Space Mono', monospace;
+		font-size: 12px;
+		letter-spacing: 0.02em;
+		color: var(--gray);
+	}
+
+	.cv__label--right {
+		text-align: right;
+	}
+
+	.cv__title {
+		font-family: 'Instrument Serif', serif;
+		font-weight: 400;
+		font-style: italic;
+		font-size: clamp(56px, 10vw, 128px);
+		letter-spacing: -0.01em;
+		line-height: 1;
+		margin: 0 0 28px;
 	}
 
 	.cv__download {
@@ -174,10 +178,11 @@ const education = [
 	}
 
 	.cv__section-title {
-		font-family: var(--font-display);
-		font-weight: 500;
-		font-size: clamp(26px, 4vw, 36px);
-		letter-spacing: -0.02em;
+		font-family: 'Instrument Serif', serif;
+		font-weight: 400;
+		font-style: italic;
+		font-size: clamp(30px, 4vw, 42px);
+		letter-spacing: -0.01em;
 		margin: 0 0 48px;
 	}
 
@@ -215,9 +220,9 @@ const education = [
 		width: 11px;
 		height: 11px;
 		border-radius: 50%;
-		background: var(--lime);
+		background: var(--accent);
 		border: 2px solid var(--white);
-		box-shadow: 0 0 0 1px var(--lime);
+		box-shadow: 0 0 0 1px var(--accent);
 	}
 
 	.timeline__date {
@@ -239,7 +244,12 @@ const education = [
 		color: var(--gray);
 	}
 
+	/* Overrides the shared .pill's lime fill — an outlined accent-blue
+	   label instead, matching the rest of the site's new palette. */
 	.timeline__tag {
+		background: transparent;
+		border: 1px solid var(--accent);
+		color: var(--accent);
 		margin-bottom: 10px;
 	}
 

@@ -40,7 +40,7 @@ const dims = new Map(
 	<Nav back={{ href: '/#work', label: '← Back' }} />
 	<main class="case" id="main-content">
 		<header class="case__header">
-			<span class="eyebrow">Case study</span>
+			<span class="eyebrow" style="--lime: var(--accent)">Case study</span>
 			<h1 class="case__title">{project.name}</h1>
 			<p class="case__summary">{project.summary}</p>
 
@@ -84,12 +84,12 @@ const dims = new Map(
 		}
 
 		<section class="case__section">
-			<span class="eyebrow" style="--lime: var(--lime-text)">The challenge</span>
+			<span class="eyebrow" style="--lime: var(--accent)">The challenge</span>
 			<p class="case__lead">{project.challenge}</p>
 		</section>
 
 		<section class="case__section">
-			<span class="eyebrow" style="--lime: var(--lime-text)">The process</span>
+			<span class="eyebrow" style="--lime: var(--accent)">The process</span>
 			<p class="case__body">{project.process}</p>
 			<div class="case__gallery" style={project.images ? `--gallery-cols: ${project.images.process.length}` : undefined}>
 				{
@@ -137,7 +137,7 @@ const dims = new Map(
 		{
 			project.extraSections?.map((section) => (
 				<section class="case__section">
-					<span class="eyebrow" style="--lime: var(--lime-text)">{section.title}</span>
+					<span class="eyebrow" style="--lime: var(--accent)">{section.title}</span>
 					<p class="case__body">{section.description}</p>
 					{section.video ? (
 						<div class="case__video">
@@ -176,18 +176,18 @@ const dims = new Map(
 		}
 
 		<section class="case__section">
-			<span class="eyebrow" style="--lime: var(--lime-text)">The result</span>
+			<span class="eyebrow" style="--lime: var(--accent)">The result</span>
 			<p class="case__lead">{project.result}</p>
 			{!project.images && <div class="case__placeholder case__placeholder--wide">Final / result image</div>}
 		</section>
 
 		<footer class="case__footer">
 			<a href={`/work/${prev.slug}`} class="case__nav-link case__nav-link--prev" aria-label={`Previous project: ${prev.name}`}>
-				<span class="eyebrow" style="--lime: var(--lime-text)">← Previous</span>
+				<span class="eyebrow" style="--lime: var(--accent)">← Previous</span>
 				<span class="case__nav-name">{prev.name}</span>
 			</a>
 			<a href={`/work/${next.slug}`} class="case__nav-link case__nav-link--next" aria-label={`Next project: ${next.name}`}>
-				<span class="eyebrow" style="--lime: var(--lime-text)">Next →</span>
+				<span class="eyebrow" style="--lime: var(--accent)">Next →</span>
 				<span class="case__nav-name">{next.name}</span>
 			</a>
 		</footer>

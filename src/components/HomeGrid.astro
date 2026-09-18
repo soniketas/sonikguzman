@@ -5,45 +5,91 @@ interface Props {
 	projects: Project[];
 }
 const { projects } = Astro.props;
+
+// A video Sonia animated herself in Figma (public/videos/shape-abstract.webm)
+// — checked it for real alpha transparency first (ffprobe/ffmpeg extraction
+// showed the alpha channel is 255/fully opaque everywhere, so there's no
+// built-in transparency to rely on). Playback is driven entirely by scroll
+// position on the project grid (see the <script> below) rather than
+// autoplaying/looping on its own — which also sidesteps the "visible jump
+// on loop restart" problem, since scrubbing back and forth never actually
+// crosses the clip's hard start/end seam the way a repeating loop would.
 ---
 
 <div class="home">
 	<nav class="home__nav" aria-label="Secondary">
 		<a href="/curriculum">Curriculum</a>
 		<a href="https://linkedin.com/in/soniaguz19" target="_blank" rel="noopener">LinkedIn</a>
-		<a href="mailto:sonia.guzman.19@gmail.com">Email</a>
 	</nav>
 
 	<header class="home__id">
+		<div class="home__mass-frame">
+			<video class="home__mass" muted playsinline preload="auto" aria-hidden="true">
+				<source src="/videos/shape-abstract.webm" type="video/webm" />
+			</video>
+		</div>
 		<div class="home__title">
-			<span class="home__dot" aria-hidden="true"></span>
 			<h1 class="home__name">Sonia</h1>
 		</div>
-		<p class="home__bio">
-			Independent UX/UI designer and developer who builds with a lighter footprint and designs for everyone.
-		</p>
+		<div class="home__contact">
+			<p class="home__role">Independent UX/UI Designer &amp; Developer</p>
+			<p class="home__bio">
+				I build with a lighter footprint and design for everyone, following WCAG accessibility guidelines. I
+				collaborate with studios and brands on projects spanning branding to full digital products. Based in
+				Berlin.
+			</p>
+			<a href="mailto:sonia.guzman.19@gmail.com" class="home__email">sonia.guzman.19@gmail.com</a>
+		</div>
 	</header>
 
-	<div class="home__grid" id="home-grid" role="list">
+	<div class="home__scroll">
+		<div class="home__grid" id="home-grid" role="list">
+			{
+				projects.map((project, i) => (
+					<a
+						href={`/work/${project.slug}`}
+						class="cell"
+						role="listitem"
+						data-index={i}
+						aria-label={`${project.name}, ${project.tagline}, ${project.year}`}
+					>
+						<span class="cell__year">{project.year}</span>
+						<div class="cell__tags">
+							{project.tools.split(',').map((tool) => (
+								<span class="pill cell__tag">{tool.trim()}</span>
+							))}
+						</div>
+						<div class="cell__title">
+							<h2 class="cell__name">{project.name}</h2>
+						</div>
+					</a>
+				))
+			}
+		</div>
+	</div>
+
+	<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Project preview" hidden>
+		<button type="button" class="lightbox__close" id="lightbox-close" aria-label="Close preview">Close</button>
+		<button type="button" class="lightbox__arrow lightbox__arrow--prev" id="lightbox-prev" aria-label="Previous project">‹</button>
+		<button type="button" class="lightbox__arrow lightbox__arrow--next" id="lightbox-next" aria-label="Next project">›</button>
 		{
-			projects.map((project) => (
-				<a
-					href={`/work/${project.slug}`}
-					class="cell"
-					role="listitem"
-					aria-label={`${project.name}, ${project.tagline}, ${project.year}`}
-				>
-					<span class="cell__year">{project.year}</span>
-					<div class="cell__tags">
-						{project.tools.split(',').map((tool) => (
-							<span class="pill cell__tag">{tool.trim()}</span>
-						))}
-					</div>
-					<div class="cell__title">
-						<h2 class="cell__name">{project.name}</h2>
-						<span class="cell__client">{project.tagline}</span>
-					</div>
-				</a>
+			projects.map((project, i) => (
+				<figure class="lightbox__slide" data-index={i} hidden={i !== 0}>
+					<figcaption class="lightbox__info">
+						<span class="lightbox__year">{project.year}</span>
+						<h3 class="lightbox__name">{project.name}</h3>
+						<p class="lightbox__tagline">{project.tagline}</p>
+						<a href={`/work/${project.slug}`} class="lightbox__link">View case study →</a>
+					</figcaption>
+					{project.images && (
+						<img
+							src={project.images.cover.src}
+							alt={project.images.cover.alt}
+							class="lightbox__image"
+							loading="lazy"
+						/>
+					)}
+				</figure>
 			))
 		}
 	</div>
@@ -53,11 +99,12 @@ const { projects } = Astro.props;
 	.home {
 		height: 100svh;
 		display: grid;
-		grid-template-columns: minmax(200px, 22vw) 1fr;
-		padding: var(--margin);
-		gap: clamp(24px, 4vw, 56px);
+		grid-template-columns: minmax(360px, 44vw) 1fr;
 	}
 
+	/* Fixed over the scrolling grid on desktop too, not just mobile — a
+	   dark-hover card scrolling underneath it needs the same backdrop for
+	   the nav text to stay readable, not just a plain transparent label. */
 	.home__nav {
 		position: fixed;
 		top: clamp(20px, 3vw, 32px);
@@ -70,6 +117,11 @@ const { projects } = Astro.props;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
 		color: var(--gray);
+		background: color-mix(in srgb, var(--white) 80%, transparent);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		padding: 8px 16px;
+		border-radius: 20px;
 	}
 
 	.home__nav a:hover,
@@ -80,36 +132,47 @@ const { projects } = Astro.props;
 	.home__id {
 		position: relative;
 		min-width: 0;
+		padding: var(--margin);
+		overflow: hidden;
 	}
 
-	/* Both pinned to the same 50% line as the grid's own vertical center
-	   (.home__id spans the same height as .home__grid's row), so the title
-	   sits exactly level with the grid regardless of the bio's height below
-	   it — centering the title+bio block as one unit would instead pull the
-	   title above that line, since the bio adds more weight below it. */
+	.home__mass-frame {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		overflow: hidden;
+	}
+
+	/* One fade, left to right: fully visible at the left edge, down to
+	   nothing by the right edge — this is what keeps the video from
+	   ending in an abrupt cut against the page's plain background,
+	   instead of a separate "hole" faded out behind the text. */
+	.home__mass {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		-webkit-mask-image: linear-gradient(to right, black 0%, transparent 100%);
+		mask-image: linear-gradient(to right, black 0%, transparent 100%);
+	}
+
+	/* Both pinned to the same line, so the title sits exactly level with
+	   .home__contact regardless of the bio's height below it — centering
+	   the title+bio block as one unit would instead pull the title above
+	   that line, since the bio adds more weight below it. Anchored above
+	   the true 50% mark (not dead-center) so the whole block sits a bit
+	   higher in the pane. */
 	.home__title {
 		position: absolute;
-		top: 50%;
-		left: 0;
+		top: 40%;
+		left: var(--margin);
 		transform: translateY(-50%);
 		display: flex;
 		align-items: center;
 		gap: 10px;
-	}
-
-	.home__bio {
-		position: absolute;
-		top: 50%;
-		left: 0;
-		transform: translateY(calc(-50% + 38px));
-	}
-
-	.home__dot {
-		width: 10px;
-		height: 10px;
-		border-radius: 50%;
-		background: var(--lime);
-		flex-shrink: 0;
+		z-index: 1;
 	}
 
 	.home__name {
@@ -120,54 +183,144 @@ const { projects } = Astro.props;
 		margin: 0;
 	}
 
-	.home__bio {
-		font-size: 14px;
-		line-height: 1.5;
-		color: var(--gray);
-		margin: 0;
-		max-width: 32ch;
+	/* anchored by its own top edge, not centered on its own height like
+	   .home__title is — centering it would grow upward into the title as
+	   soon as the content wraps to more lines on a narrower screen, since a
+	   taller centered box extends further in both directions from the same
+	   center point. The email lives inside this same box (in normal flow,
+	   right after the bio) rather than getting its own separate fixed
+	   offset, precisely to avoid that bug recurring a third time. */
+	.home__contact {
+		position: absolute;
+		top: calc(40% + 38px);
+		left: var(--margin);
+		right: var(--margin);
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
 	}
 
+	/* A soft blurred glow behind the text instead of a flat panel — no
+	   visible rectangle/edges, since the ::before extends 24px past the
+	   text on every side and blur(18px) feathers that margin away rather
+	   than leaving a hard boundary. Calibrated against the same measured
+	   worst-case video frame as before: 45% white reaches ~4.5:1 there
+	   (normal-text WCAG AA), so role/bio/email can go back to their
+	   original weights and sizes instead of relying on the "large text"
+	   3:1 exemption. */
+	.home__contact::before {
+		content: '';
+		position: absolute;
+		inset: -24px;
+		background: color-mix(in srgb, var(--white) 45%, transparent);
+		filter: blur(18px);
+		z-index: -1;
+	}
+
+	.home__role {
+		font-size: 18px;
+		font-weight: 500;
+		color: var(--ink);
+		margin: 0;
+	}
+
+	.home__bio {
+		font-size: 16px;
+		line-height: 1.5;
+		color: var(--ink);
+		margin: 0;
+		max-width: 38ch;
+	}
+
+	.home__email {
+		font-size: 16px;
+		font-weight: 500;
+		color: var(--ink);
+	}
+
+	.home__email:hover,
+	.home__email:focus-visible {
+		color: var(--gray);
+	}
+
+	/* This pane owns its own scroll — the left identity column stays static
+	   the whole time, only the projects scroll. */
+	.home__scroll {
+		height: 100%;
+		overflow-y: auto;
+		padding: var(--margin);
+	}
+
+	/* Real gaps between cards instead of hairline dividers — the old
+	   background-color-as-grout trick only worked at gap:1px; at a visible
+	   gap the "background" would just show through as a solid-colored
+	   backdrop between cards instead of the page's own background. */
 	.home__grid {
 		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		align-self: center;
-		gap: 1px;
-		background: var(--border);
-		border: 1px solid var(--border);
+		grid-template-columns: repeat(2, 1fr);
+		gap: 20px;
 	}
 
+	/* Taller than before (was 3:2) — also means each row takes up more
+	   vertical space, so the pane needs more scroll distance to reach the
+	   bottom, giving the scroll-scrubbed video more room to play through. */
 	.cell {
 		position: relative;
 		display: block;
-		/* taller than wide, but not as extreme as a plain 4-col / 2-row split
-		   across the full viewport height would force it to be */
-		aspect-ratio: 5 / 7;
-		padding: clamp(16px, 2.2vw, 28px);
+		aspect-ratio: 1 / 1;
+		padding: clamp(14px, 1.8vw, 22px);
 		background: var(--white);
 		color: var(--ink);
-		transition: background 0.18s ease, color 0.18s ease;
+		/* a faint tint of the video's accent blue instead of a neutral
+		   gray — ties the grid back to the animation without being loud
+		   about it */
+		border: 1px solid color-mix(in srgb, #1c22a8 12%, var(--border));
+		/* sharp 90° corners on a plain-bordered rectangle is exactly what
+		   reads as an unfinished wireframe — rounding them is one of the
+		   simplest ways to make it feel like a finished surface instead */
+		border-radius: 14px;
+		/* a soft shadow gives the card real depth/weight instead of just a
+		   flat outline — the other half of what was making it read as a
+		   wireframe rather than a finished surface */
+		box-shadow: 0 1px 3px rgba(20, 20, 20, 0.04), 0 8px 20px rgba(0, 22, 90, 0.06);
+		transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+		/* mobile browsers overlay their own translucent gray tap-highlight on
+		   top of whatever :active/:hover renders — kill it so a tap shows our
+		   real black active state instead of a washed-out gray flash */
+		-webkit-tap-highlight-color: transparent;
 	}
 
+	/* Hover/active/focus now inverts to the same accent blue as the video
+	   (was plain black) — the one moment this monochrome grid gets color
+	   is the moment you're actively engaging with a project. */
 	.cell:hover,
-	.cell.is-active {
-		background: var(--ink);
+	.cell:active,
+	.cell:focus-visible {
+		background: #1c22a8;
 		color: var(--white);
+		/* a slight lift on interaction, echoing the card's own resting
+		   shadow but stronger and blue-tinted to match the new fill */
+		box-shadow: 0 10px 28px rgba(28, 34, 168, 0.28);
 		/* without this, the focus ring's box-shadow on the shared edge with
 		   the next cell in DOM order gets painted over by that sibling,
 		   since plain grid items stack in DOM order, not by who's focused */
 		z-index: 1;
 	}
 
+	.cell:focus-visible {
+		box-shadow: 0 0 0 5px #1c22a8;
+	}
+
 	.cell:hover .cell__year,
-	.cell.is-active .cell__year,
-	.cell:hover .cell__client,
-	.cell.is-active .cell__client {
+	.cell:active .cell__year,
+	.cell:focus-visible .cell__year {
 		color: rgb(255 255 255 / 65%);
 	}
 
 	.cell:hover .cell__tag,
-	.cell.is-active .cell__tag {
+	.cell:active .cell__tag,
+	.cell:focus-visible .cell__tag {
 		background: var(--white);
 		color: var(--ink);
 	}
@@ -197,19 +350,7 @@ const { projects } = Astro.props;
 		font-size: clamp(18px, 2vw, 24px);
 		letter-spacing: -0.01em;
 		line-height: 1.1;
-		margin: 0 0 6px;
-	}
-
-	.cell__client {
-		display: block;
-		font-size: 13px;
-		line-height: 1.35;
-		color: var(--gray);
-		/* reserves space for 2 lines even when the tagline is shorter, so the
-		   name above it lands at the same height in every cell regardless of
-		   how long each tagline happens to be (the block below is bottom
-		   anchored as a whole — see .cell__title) */
-		min-height: calc(13px * 1.35 * 2);
+		margin: 0;
 	}
 
 	.cell__tags {
@@ -221,59 +362,150 @@ const { projects } = Astro.props;
 	}
 
 	.cell__tag {
-		padding: 4px 10px;
+		/* overrides the shared .pill's lime fill — this screen is monochrome,
+		   no brand color accents, so tags read as a plain outlined label */
+		background: transparent;
+		border: 1px solid var(--ink);
+		color: var(--ink);
+		padding: 3px 9px;
 		font-size: 9px;
+		/* Without this, a longer tag like "Claude (vision)" wraps its own
+		   text into two lines at narrow widths (375px, e.g. iPhone SE) —
+		   the pill itself should never break internally; if it doesn't
+		   fit, it wraps as a whole to the next row instead (handled by
+		   flex-wrap on .cell__tags), not mid-word. */
+		white-space: nowrap;
+	}
+
+	/* At this in-between width, the wider left identity column leaves the
+	   2-column grid narrow enough that projects with 4-5 tools wrap tags to
+	   enough rows to collide with the bottom-anchored title. A square cell
+	   has enough extra height to clear it here without changing anything
+	   above 1100px, where the default ratio already has enough room. */
+	@media (min-width: 901px) and (max-width: 1100px) {
+		.cell {
+			aspect-ratio: 1 / 1;
+		}
 	}
 
 	@media (max-width: 900px) {
 		.home {
 			height: auto;
 			min-height: 100svh;
-			grid-template-columns: 1fr;
-			padding-top: calc(var(--margin) + 48px);
+			display: block;
 		}
 
 		/* The desktop version pins .home__title/.home__bio with absolute
-		   positioning so the title lands exactly level with the grid's
-		   center. On mobile .home__id stacks above the grid instead of
-		   beside it, and its own height would collapse to ~0 since both
+		   positioning so the title lands exactly level with the pane's
+		   vertical center. On mobile everything stacks in normal flow
+		   instead, and .home__id's height would collapse to ~0 since both
 		   children are taken out of flow — switch them back to a normal
 		   top-to-bottom flow here. */
+		/* position:relative (not static) so the video can sit behind the
+		   text as an absolute background, the same relationship desktop
+		   has — the flex column here only governs the IN-FLOW children
+		   (title, contact); an absolutely-positioned child like
+		   .home__mass-frame is excluded from that layout automatically and
+		   just overlays behind them (z-index:0 vs. their z-index:1, set in
+		   the shared base rule). The old approach pushed .home__id down
+		   with padding-top on .home (to clear the fixed nav), which left
+		   the video starting partway down the page instead of true y:0 —
+		   removed, so the video reaches the very top of the screen and
+		   sits behind the nav's own backdrop instead of stopping short of it. */
 		.home__id {
+			position: relative;
 			display: flex;
 			flex-direction: column;
 			gap: 12px;
-			min-height: 0;
+			padding: calc(var(--margin) + 48px) var(--margin) 0;
+		}
+
+		/* Taller than .home__id's own content (title+bio+contact) on
+		   purpose — .home__id has no overflow:hidden, so this spills past
+		   its bottom edge into the space just above the grid, giving the
+		   fade room to reach toward it instead of cutting off right at
+		   the text block's own height. */
+		.home__mass-frame {
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 520px;
+			z-index: 0;
+			overflow: hidden;
+		}
+
+		/* A diagonal gradient's iso-opacity lines are diagonal too, not
+		   horizontal — at 160deg, one side of the frame's bottom edge
+		   reaches full transparency well before the other side does,
+		   so THAT side still has visible video right up against the
+		   frame's hard clip edge, reading as an abrupt cut. Flattened to
+		   170deg (barely diagonal) so the fade completes at nearly the
+		   same height across the full width, and finishing by 65% instead
+		   of 95% leaves real margin before the frame's edge on every
+		   side, not just whichever corner the gradient reaches last. */
+		.home__mass {
+			-webkit-mask-image: linear-gradient(170deg, black 0%, transparent 65%);
+			mask-image: linear-gradient(170deg, black 0%, transparent 65%);
 		}
 
 		.home__title,
-		.home__bio {
+		.home__contact {
 			position: static;
 			transform: none;
+			left: auto;
+			right: auto;
 		}
 
-		.home__grid {
-			grid-template-columns: repeat(2, 1fr);
-			align-self: auto;
+		/* On mobile the whole page scrolls together (identity block, then
+		   the grid) instead of the grid owning an independent scroll pane —
+		   matches the reference's mobile pattern of leading with narrative
+		   text before the gallery, not a split-screen layout. */
+		.home__scroll {
+			height: auto;
+			overflow-y: visible;
+			padding: 0 var(--margin) var(--margin);
 			margin-top: 32px;
 		}
 
+		/* A fixed aspect-ratio breaks the moment any project has enough
+		   tags to wrap to 3 rows (RunUp: 6 tags) — the bottom-anchored
+		   title has nowhere to go but overlap them. On mobile there's no
+		   grid of identically-sized cards to keep level with each other
+		   the way desktop does, so height can just be automatic — each
+		   cell grows to fit its own content instead of clipping it. */
+		/* Tighter gap between cards — the freed-up width lets more tags
+		   fit per row before wrapping, so tall outliers like RunUp's 6
+		   tags are less likely in the first place, not just handled
+		   gracefully when they happen. */
+		.home__grid {
+			gap: 10px;
+		}
+
 		.cell {
-			aspect-ratio: 4 / 5;
+			aspect-ratio: auto;
+			min-height: 200px;
 			padding: 16px;
+			display: flex;
+			flex-direction: column;
 		}
 
 		.cell__tags {
 			padding-right: 34px;
 		}
 
-		.cell__name {
-			font-size: 16px;
+		.cell__title {
+			position: static;
+			left: auto;
+			right: auto;
+			bottom: auto;
+			margin-top: auto;
+			padding-top: 16px;
 		}
 
-		.cell__client {
-			font-size: 12px;
-			min-height: calc(12px * 1.35 * 2);
+		.cell__name {
+			font-size: 16px;
 		}
 
 		.cell__tag {
@@ -281,59 +513,301 @@ const { projects } = Astro.props;
 			padding: 3px 8px;
 		}
 	}
+
+	.lightbox {
+		position: fixed;
+		inset: 0;
+		z-index: 100;
+		background: var(--white);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: var(--margin);
+	}
+
+	.lightbox[hidden] {
+		display: none;
+	}
+
+	.lightbox__close {
+		position: absolute;
+		top: clamp(20px, 3vw, 32px);
+		right: clamp(20px, 4vw, 64px);
+		background: none;
+		border: none;
+		padding: 0;
+		font-size: 12px;
+		font-weight: 500;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--gray);
+		cursor: pointer;
+	}
+
+	.lightbox__close:hover,
+	.lightbox__close:focus-visible {
+		color: var(--ink);
+	}
+
+	.lightbox__arrow {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		background: none;
+		border: none;
+		padding: 8px;
+		font-size: 40px;
+		line-height: 1;
+		color: var(--ink);
+		cursor: pointer;
+	}
+
+	.lightbox__arrow--prev {
+		left: clamp(8px, 2vw, 32px);
+	}
+
+	.lightbox__arrow--next {
+		right: clamp(8px, 2vw, 32px);
+	}
+
+	.lightbox__arrow:hover,
+	.lightbox__arrow:focus-visible {
+		color: var(--gray);
+	}
+
+	/* title + short description on one side, the cover photo on the
+	   other — the "two-column detail" pattern from the reference, instead
+	   of stacking the image above a caption */
+	.lightbox__slide {
+		display: flex;
+		align-items: center;
+		gap: clamp(24px, 5vw, 64px);
+		max-width: min(1000px, 86vw);
+		margin: 0;
+	}
+
+	.lightbox__slide[hidden] {
+		display: none;
+	}
+
+	.lightbox__info {
+		flex: 0 0 auto;
+		width: clamp(200px, 26vw, 280px);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.lightbox__image {
+		flex: 1 1 auto;
+		min-width: 0;
+		max-width: 100%;
+		max-height: 70vh;
+		width: auto;
+		object-fit: contain;
+	}
+
+	.lightbox__name {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: 24px;
+		margin: 0;
+	}
+
+	.lightbox__year {
+		font-size: 13px;
+		color: var(--gray);
+	}
+
+	.lightbox__tagline {
+		font-size: 14px;
+		line-height: 1.5;
+		color: var(--gray);
+		margin: 0;
+	}
+
+	.lightbox__link {
+		margin-top: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		text-decoration: underline;
+		text-decoration-color: var(--border);
+		text-underline-offset: 3px;
+	}
+
+	.lightbox__link:hover,
+	.lightbox__link:focus-visible {
+		text-decoration-color: currentColor;
+	}
+
+	@media (max-width: 900px) {
+		.lightbox__arrow {
+			font-size: 32px;
+		}
+
+		.lightbox__slide {
+			flex-direction: column;
+			max-width: min(420px, 86vw);
+		}
+
+		.lightbox__info {
+			width: 100%;
+			order: 2;
+		}
+
+		.lightbox__image {
+			order: 1;
+			max-height: 50vh;
+		}
+	}
 </style>
 
 <script>
-	const grid = document.getElementById('home-grid');
-	const cells = grid ? Array.from(grid.querySelectorAll<HTMLAnchorElement>('.cell')) : [];
+	const massVideo = document.querySelector<HTMLVideoElement>('.home__mass');
+	const scrollPane = document.querySelector<HTMLElement>('.home__scroll');
+	const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	// Mobile stacks the video as a normal banner in the page's own scroll
+	// flow instead of giving the grid its own independent scroll pane —
+	// there's no separate "scrollPane" whose position maps meaningfully to
+	// playback there, so it just autoplays on its own instead.
+	const isMobileLayout = window.matchMedia('(max-width: 900px)').matches;
 
-	if (grid && cells.length > 0 && window.matchMedia('(min-width: 901px)').matches) {
-		// No page scrolling on the homepage grid: wheel input moves the
-		// selection between cells instead, the same way Tab does. Hover, Tab,
-		// and wheel all converge on real DOM focus (via focusin below and the
-		// mouseenter handler further down), so exactly one cell is ever
-		// highlighted, never a mouse-hovered one and a wheel-selected one at
-		// the same time, and Enter always works on whichever cell is active.
-		let currentIndex = -1;
-		let lastWheelAt = 0;
+	if (massVideo && reducedMotion) {
+		massVideo.pause();
+	} else if (massVideo && isMobileLayout) {
+		// A native loop jumps back to frame 0 the instant it hits the end —
+		// visible as a hard cut, since the clip's last frame doesn't match
+		// its first. Playing it backward instead (by manually stepping
+		// currentTime down via rAF, since browsers don't support negative
+		// playbackRate reliably) turns that cut into a smooth reversal —
+		// the clip breathes forward and back instead of restarting.
+		// PLAYBACK_RATE slows both directions equally — forward via the
+		// native property, backward by scaling the manual time step by
+		// the same factor, so neither direction looks faster than the other.
+		const PLAYBACK_RATE = 0.5;
+		massVideo.playbackRate = PLAYBACK_RATE;
+		let direction: 1 | -1 = 1;
 
-		cells.forEach((cell) => {
-			cell.addEventListener('mouseenter', () => cell.focus({ preventScroll: true }));
+		function stepBackward(lastTime: number) {
+			requestAnimationFrame((now) => {
+				const dt = ((now - lastTime) / 1000) * PLAYBACK_RATE;
+				const next = massVideo!.currentTime - dt;
+				if (next <= 0) {
+					massVideo!.currentTime = 0;
+					direction = 1;
+					massVideo!.play().catch(() => {});
+					return;
+				}
+				massVideo!.currentTime = next;
+				stepBackward(now);
+			});
+		}
+
+		massVideo.addEventListener('ended', () => {
+			if (direction !== 1) return;
+			direction = -1;
+			massVideo!.pause();
+			stepBackward(performance.now());
 		});
 
-		grid.addEventListener(
-			'wheel',
-			(e) => {
-				e.preventDefault();
-				const now = Date.now();
-				if (now - lastWheelAt < 250) return;
-				lastWheelAt = now;
+		// The initial .play() call can be silently rejected by a browser's
+		// autoplay policy — muted+playsinline covers most cases, but not
+		// all (stricter mobile browsers, low-power mode, etc.). Retrying
+		// on the very first touch/scroll/click catches those cases
+		// instead of leaving the video paused with no way to recover.
+		function retryPlayOnce() {
+			if (massVideo!.paused) massVideo!.play().catch(() => {});
+			window.removeEventListener('touchstart', retryPlayOnce);
+			window.removeEventListener('scroll', retryPlayOnce);
+			window.removeEventListener('click', retryPlayOnce);
+		}
+		window.addEventListener('touchstart', retryPlayOnce, { passive: true, once: true });
+		window.addEventListener('scroll', retryPlayOnce, { passive: true, once: true });
+		window.addEventListener('click', retryPlayOnce, { once: true });
 
-				const active = document.activeElement;
-				const activeIdx = cells.indexOf(active as HTMLAnchorElement);
-				if (activeIdx !== -1) currentIndex = activeIdx;
+		massVideo.play().catch(retryPlayOnce);
+	} else if (massVideo && scrollPane) {
+		let ticking = false;
 
-				const direction = e.deltaY > 0 || e.deltaX > 0 ? 1 : -1;
-				currentIndex = Math.min(cells.length - 1, Math.max(0, currentIndex + direction));
-				cells[currentIndex].focus({ preventScroll: true });
+		function syncVideoToScroll() {
+			ticking = false;
+			const duration = massVideo!.duration;
+			if (!duration || Number.isNaN(duration)) return;
+			const scrollable = scrollPane!.scrollHeight - scrollPane!.clientHeight;
+			const fraction = scrollable > 0 ? scrollPane!.scrollTop / scrollable : 0;
+			massVideo!.currentTime = Math.max(0, Math.min(1, fraction)) * duration;
+		}
+
+		scrollPane.addEventListener(
+			'scroll',
+			() => {
+				if (!ticking) {
+					ticking = true;
+					requestAnimationFrame(syncVideoToScroll);
+				}
 			},
-			{ passive: false },
+			{ passive: true }
 		);
 
-		grid.addEventListener('focusin', (e) => {
-			cells.forEach((c) => c.classList.remove('is-active'));
-			const target = e.target as HTMLElement;
-			if (target.classList.contains('cell')) target.classList.add('is-active');
+		// Only start driving currentTime once metadata (and therefore
+		// duration) has actually loaded — reading .duration before that
+		// returns NaN.
+		massVideo.addEventListener('loadedmetadata', syncVideoToScroll);
+	}
+
+	const cells = Array.from(document.querySelectorAll<HTMLAnchorElement>('.cell'));
+	const lightbox = document.getElementById('lightbox');
+	const slides = Array.from(document.querySelectorAll<HTMLElement>('.lightbox__slide'));
+	const closeBtn = document.getElementById('lightbox-close');
+	const prevBtn = document.getElementById('lightbox-prev');
+	const nextBtn = document.getElementById('lightbox-next');
+
+	if (lightbox && slides.length > 0) {
+		let currentIndex = 0;
+		let previouslyFocused: HTMLElement | null = null;
+
+		function show(index: number) {
+			currentIndex = (index + slides.length) % slides.length;
+			slides.forEach((slide, i) => {
+				slide.hidden = i !== currentIndex;
+			});
+		}
+
+		function open(index: number) {
+			previouslyFocused = document.activeElement as HTMLElement;
+			show(index);
+			lightbox.hidden = false;
+			closeBtn?.focus();
+		}
+
+		function close() {
+			lightbox.hidden = true;
+			previouslyFocused?.focus();
+		}
+
+		// Click still lands on a real link to the case study (works with no
+		// JS, and with middle-click / cmd-click to open in a new tab) — a
+		// plain left click intercepts that to show the lightbox preview
+		// first instead of navigating immediately.
+		cells.forEach((cell) => {
+			cell.addEventListener('click', (e) => {
+				if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+				const index = Number(cell.dataset.index);
+				if (Number.isNaN(index)) return;
+				e.preventDefault();
+				open(index);
+			});
 		});
 
-		grid.addEventListener('focusout', () => {
-			// only clear if focus is leaving the grid entirely, not moving
-			// from one cell to another within it
-			requestAnimationFrame(() => {
-				if (!grid.contains(document.activeElement)) {
-					cells.forEach((c) => c.classList.remove('is-active'));
-				}
-			});
+		closeBtn?.addEventListener('click', close);
+		prevBtn?.addEventListener('click', () => show(currentIndex - 1));
+		nextBtn?.addEventListener('click', () => show(currentIndex + 1));
+
+		lightbox.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape') close();
+			if (e.key === 'ArrowLeft') show(currentIndex - 1);
+			if (e.key === 'ArrowRight') show(currentIndex + 1);
 		});
 	}
 </script>

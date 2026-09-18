@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
 	--ink: #141414;
@@ -7,6 +7,11 @@
 	--white: #ffffff;
 	--lime: #c7ff3d;
 	--lime-text: #5c7a05;
+	/* Sampled directly from the home page's video background (a deep
+	   indigo, not the brighter cobalt #0032bd used earlier in that
+	   project) — the one accent color used across the new design system,
+	   replacing the old lime green on pages that need to match it. */
+	--accent: #1c22a8;
 
 	--font-display: 'Space Grotesk', sans-serif;
 	--font-body: 'Inter', sans-serif;

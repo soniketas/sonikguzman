@@ -11,10 +11,22 @@ import { projects } from '../data/projects';
 </Layout>
 
 <style is:global>
-	/* No-scroll single-screen only applies where the grid's hover/wheel/tab
-	   interaction model actually works (see the matching min-width check in
-	   HomeGrid.astro's script). Below that, the grid stacks into one column
-	   and needs normal page scroll to reach every card. */
+	/* Redefining --white here (rather than in global.css) scopes the new
+	   off-white to this page only — every existing var(--white) reference
+	   in HomeGrid.astro (cells, nav, lightbox) picks it up automatically,
+	   without touching the shared token every other page still uses. */
+	body.home-page {
+		--white: #e9e6e0;
+		background: var(--white);
+		/* subtle analog paper grain, matching the reference's textured
+		   print feel — a tiled fractal-noise SVG at very low alpha */
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+	}
+
+	/* Desktop is a static left column + an independently scrolling right
+	   pane (.home__scroll in HomeGrid.astro) — the page itself must never
+	   scroll, or the static column would scroll away with it. Below this
+	   width everything stacks into one normally-scrolling page instead. */
 	@media (min-width: 901px) {
 		html:has(body.home-page) {
 			height: 100%;
