@@ -28,6 +28,13 @@ export interface Project {
 	nameColor: string; // project name overlay color
 	images?: {
 		cover: ImageEntry;
+		// 'cover' is for a cover image that's already a composed photographic
+		// mockup (e.g. a phone rendered in a real scene) — it drops the
+		// brand-color letterbox and crops to a wide, frameless panorama
+		// instead of containing the whole photo inside a colored box.
+		// Default ('contain') suits a plain app/site screenshot, which
+		// still wants the colored box as a backdrop around it.
+		coverFit?: 'contain' | 'cover';
 		process: ImageEntry[];
 		// 'contain' for portrait screenshots (e.g. phone UI) that would
 		// otherwise get cropped by the gallery's default landscape cover-crop
@@ -310,6 +317,7 @@ export const projects: Project[] = [
 				src: '/images/dwa-kolory/cover-mockup.webp',
 				alt: 'Dwa Kolory homepage design shown on an angled iPhone mockup against a bright abstract background, with a 2x2 category grid for accessories, gifts, clothing, and t-shirts below the logo and nav.',
 			},
+			coverFit: 'cover',
 			process: [
 				{
 					src: '/images/dwa-kolory/mobile-category.webp',
