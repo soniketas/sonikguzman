@@ -103,6 +103,10 @@ const dims = new Map(
 							// elsewhere in the site never use one, only phone UI does.
 							const isPhone = isContain && (dims.get(image.src)?.height ?? 0) > (dims.get(image.src)?.width ?? 0);
 							const isWide = isContain && !isPhone;
+							// opt-in device-mockup bezel: a dark CSS chassis + notch replaces the
+							// flat brand-color letterbox, so the image reads as a photographed
+							// phone rather than a cropped screenshot
+							const isPhoneFrame = image.frame === 'phone';
 							return (
 								<div
 									class:list={[
@@ -110,8 +114,9 @@ const dims = new Map(
 										'case__placeholder--image',
 										isPhone && 'case__placeholder--contain-phone',
 										isWide && 'case__placeholder--contain-wide',
+										isPhoneFrame && 'case__placeholder--frame-phone',
 									]}
-									style={isWide ? undefined : `background:${project.color}`}
+									style={isWide || isPhoneFrame ? undefined : `background:${project.color}`}
 								>
 									<img
 										src={image.src}
@@ -156,19 +161,40 @@ const dims = new Map(
 							)}
 						</div>
 					) : (
-						<div class="case__gallery case__gallery--wide">
-							{section.images?.map((image) => (
-								<div class="case__placeholder case__placeholder--wide-image" style={`background:${project.color}`}>
-									<img
-										src={image.src}
-										alt={image.alt}
-										width={dims.get(image.src)?.width}
-										height={dims.get(image.src)?.height}
-										loading="lazy"
-										decoding="async"
-									/>
-								</div>
-							))}
+						<div
+							class="case__gallery case__gallery--wide"
+							style={section.images ? `--gallery-cols-wide: ${section.images.length === 1 ? 1 : 2}` : undefined}
+						>
+							{section.images?.map((image) => {
+								// opt-in browser-chrome bar above a landscape screenshot, same
+								// idea as the phone bezel above: reads as a browser window
+								// instead of a cropped screenshot
+								const isBrowserFrame = image.frame === 'browser';
+								return (
+									<div
+										class:list={[
+											'case__placeholder',
+											'case__placeholder--wide-image',
+											isBrowserFrame && 'case__placeholder--frame-browser',
+										]}
+										style={isBrowserFrame ? undefined : `background:${project.color}`}
+									>
+										{isBrowserFrame && (
+											<div class="case__browser-bar" aria-hidden="true">
+												<span /><span /><span />
+											</div>
+										)}
+										<img
+											src={image.src}
+											alt={image.alt}
+											width={dims.get(image.src)?.width}
+											height={dims.get(image.src)?.height}
+											loading="lazy"
+											decoding="async"
+										/>
+									</div>
+								);
+							})}
 						</div>
 					)}
 				</section>
@@ -419,6 +445,16 @@ const dims = new Map(
 		object-position: center;
 	}
 
+	/* semi-realistic phone mockup: a dark bezel + shadow around a plain
+	   screenshot, opted into per-image via `frame: 'phone'`, so it reads as a
+	   photographed device instead of a flat cropped screenshot */
+	.case__placeholder--frame-phone img {
+		box-sizing: border-box;
+		border: 12px solid #161616;
+		border-radius: 38px;
+		box-shadow: 0 20px 44px rgb(0 0 0 / 25%);
+	}
+
 	.case__placeholder--contain-wide {
 		height: auto;
 		background: transparent;
@@ -435,7 +471,7 @@ const dims = new Map(
 	}
 
 	.case__gallery--wide {
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(var(--gallery-cols-wide, 2), 1fr);
 	}
 
 	.case__placeholder--wide-image {
@@ -450,6 +486,36 @@ const dims = new Map(
 		object-fit: cover;
 		object-position: top;
 		border-radius: 20px;
+	}
+
+	/* semi-realistic browser mockup: a chrome bar (traffic-light dots) above
+	   a plain desktop screenshot, opted into per-image via `frame: 'browser'` */
+	.case__placeholder--frame-browser {
+		display: flex;
+		flex-direction: column;
+		background: #e7e7e7;
+	}
+
+	.case__browser-bar {
+		flex: 0 0 auto;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 0 14px;
+	}
+
+	.case__browser-bar span {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: #c2c2c2;
+	}
+
+	.case__placeholder--frame-browser img {
+		flex: 1 1 auto;
+		min-height: 0;
+		border-radius: 0 0 20px 20px;
 	}
 
 	.case__footer {
@@ -523,6 +589,22 @@ const dims = new Map(
 			max-height: none;
 			width: 100%;
 			height: auto;
+		}
+
+		/* keep the phone bezel from stretching edge-to-edge on a narrow
+		   screen — a full-width "device" reads oddly once it's as wide as
+		   the viewport itself */
+		.case__placeholder--frame-phone img {
+			width: 78%;
+			margin: 0 auto;
+			display: block;
+			border-width: 8px;
+			border-radius: 28px;
+		}
+
+		.case__browser-bar {
+			height: 24px;
+			padding: 0 10px;
 		}
 	}
 </style>

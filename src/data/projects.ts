@@ -1,3 +1,14 @@
+interface ImageEntry {
+	src: string;
+	alt: string;
+	// opt-in CSS device-mockup framing for a plain screenshot: 'phone' wraps a
+	// portrait shot in a bezel + notch, 'browser' adds a browser-chrome bar
+	// above a landscape shot. Omit for the default frameless/cover-crop look,
+	// and never set this on an image that's already a photographic mockup
+	// (e.g. a rendered phone-in-a-scene) since it would double up the frame.
+	frame?: 'phone' | 'browser';
+}
+
 export interface Project {
 	slug: string;
 	name: string;
@@ -16,8 +27,8 @@ export interface Project {
 	color: string; // stack card background
 	nameColor: string; // project name overlay color
 	images?: {
-		cover: { src: string; alt: string };
-		process: { src: string; alt: string }[];
+		cover: ImageEntry;
+		process: ImageEntry[];
 		// 'contain' for portrait screenshots (e.g. phone UI) that would
 		// otherwise get cropped by the gallery's default landscape cover-crop
 		processFit?: 'cover' | 'contain';
@@ -25,7 +36,7 @@ export interface Project {
 	extraSections?: {
 		title: string;
 		description: string;
-		images?: { src: string; alt: string }[];
+		images?: ImageEntry[];
 		// controls: adds a minimal pause/play button — reserve for videos long
 		// enough (WCAG 2.2.2, >5s) that autoplay-loop needs a way to stop
 		video?: { src: string; description: string; controls?: boolean };
@@ -296,22 +307,35 @@ export const projects: Project[] = [
 		nameColor: '#f0c814',
 		images: {
 			cover: {
-				src: '/images/dwa-kolory/mobile-home.webp',
-				alt: 'Dwa Kolory mobile homepage with a wheat field hero photo above the start of a stacked category row.',
+				src: '/images/dwa-kolory/cover-mockup.webp',
+				alt: 'Dwa Kolory homepage design shown on an angled iPhone mockup against a bright abstract background, with a 2x2 category grid for accessories, gifts, clothing, and t-shirts below the logo and nav.',
 			},
 			process: [
 				{
 					src: '/images/dwa-kolory/mobile-category.webp',
 					alt: 'Dwa Kolory mobile accessories category page, showing crochet keychains one per row: a pumpkin, out of stock, at the top.',
+					frame: 'phone',
 				},
 				{
 					src: '/images/dwa-kolory/mobile-product.webp',
 					alt: 'Dwa Kolory mobile product page for a crochet pumpkin keychain, marked out of stock, with expandable description and details sections below.',
+					frame: 'phone',
 				},
 			],
 			processFit: 'contain',
 		},
 		extraSections: [
+			{
+				title: 'Checkout, kept short',
+				description:
+					"The path from a product photo to checkout stays short: an express-pay row (Shop Pay, PayPal, Google Pay, Apple Pay) sits above the standard contact-info form, so returning shoppers can skip straight past it.",
+				images: [
+					{
+						src: '/images/dwa-kolory/checkout-mockup.webp',
+						alt: 'Dwa Kolory checkout screen on an iPhone mockup against a dark concrete background, showing express-pay buttons for Shop Pay, PayPal, Google Pay, and Apple Pay above a contact information form.',
+					},
+				],
+			},
 			{
 				title: 'On desktop',
 				description:
@@ -320,18 +344,22 @@ export const projects: Project[] = [
 					{
 						src: '/images/dwa-kolory/desktop-home.webp',
 						alt: 'Dwa Kolory desktop homepage with a wheat field hero photo and a category row for accessories, candles, and clothes.',
+						frame: 'browser',
 					},
 					{
 						src: '/images/dwa-kolory/desktop-category.webp',
 						alt: 'Dwa Kolory desktop accessories category grid of crochet keychains, including a pumpkin, sunflower, bird, and cat, each with its price.',
+						frame: 'browser',
 					},
 					{
 						src: '/images/dwa-kolory/desktop-product.webp',
 						alt: 'Dwa Kolory desktop product page for a crochet pumpkin keychain, priced at €10 and marked out of stock.',
+						frame: 'browser',
 					},
 					{
 						src: '/images/dwa-kolory/desktop-candles.webp',
 						alt: 'Dwa Kolory desktop candles category page, showing two stone-carved candles priced at €70 each.',
+						frame: 'browser',
 					},
 				],
 			},
