@@ -476,7 +476,7 @@ export const projects: Project[] = [
 				src: '/images/ipe-systeme/laptop-mockup.webp',
 				alt: "IPE Systeme homepage on a laptop mockup, with the headline 'Juntos, somos más sostenibles' over an aerial river landscape photo and a call to request a free water audit.",
 			},
-			coverFit: 'cover',
+			coverFit: 'flush',
 			process: [
 				{
 					src: '/images/ipe-systeme/methodology.webp',
