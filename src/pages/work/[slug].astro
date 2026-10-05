@@ -21,7 +21,7 @@ const { project, next, prev } = Astro.props;
 // read real pixel dimensions from disk so <img> can carry width/height
 // (avoids layout shift) without hand-maintaining them in projects.ts
 const imageSrcs = [
-	project.images?.cover.src,
+	project.images?.cover?.src,
 	...(project.images?.process.map((p) => p.src) ?? []),
 	...(project.extraSections?.flatMap((s) => s.images?.map((i) => i.src) ?? []) ?? []),
 ].filter((src): src is string => Boolean(src));
@@ -65,14 +65,15 @@ const dims = new Map(
 		</header>
 
 		{
-			project.images ? (
+			project.images?.cover && (
 				<div
 					class:list={[
 						'case__cover',
 						'case__cover--image',
 						project.images.coverFit === 'cover' && 'case__cover--panoramic',
+						project.images.coverFit === 'flush' && 'case__cover--flush',
 					]}
-					style={project.images.coverFit === 'cover' ? undefined : `background:${project.color}`}
+					style={project.images.coverFit === 'cover' || project.images.coverFit === 'flush' ? undefined : `background:${project.color}`}
 				>
 					<img
 						src={project.images.cover.src}
@@ -82,10 +83,6 @@ const dims = new Map(
 						decoding="async"
 						fetchpriority="high"
 					/>
-				</div>
-			) : (
-				<div class="case__cover" style={`background:${project.color}`}>
-					<span style={`color:${project.nameColor}`}>Project cover image</span>
 				</div>
 			)
 		}
@@ -108,7 +105,9 @@ const dims = new Map(
 							// framed box; a desktop/web screenshot (landscape) doesn't need a
 							// frame at all, on any screen size — screenshots of web pages
 							// elsewhere in the site never use one, only phone UI does.
-							const isPhone = isContain && (dims.get(image.src)?.height ?? 0) > (dims.get(image.src)?.width ?? 0);
+							const isPhone =
+								isContain &&
+								(image.box ? image.box === 'phone' : (dims.get(image.src)?.height ?? 0) > (dims.get(image.src)?.width ?? 0));
 							const isWide = isContain && !isPhone;
 							// opt-in device-mockup bezel: a dark CSS chassis + notch replaces the
 							// flat brand-color letterbox, so the image reads as a photographed
@@ -151,40 +150,39 @@ const dims = new Map(
 				<section class="case__section">
 					<span class="eyebrow" style="--lime: var(--accent)">{section.title}</span>
 					<p class="case__body">{section.description}</p>
-					{section.video ? (
-						<div class="case__video">
-							<video
-								src={section.video.src}
-								aria-label={section.video.description}
-								autoplay
-								muted
-								loop
-								playsinline
-							/>
-							{section.video.controls && (
-								<button type="button" class="case__video-toggle" data-state="playing" aria-label="Pause video">
-									<span class="case__video-toggle-icon" aria-hidden="true" />
-								</button>
-							)}
-						</div>
-					) : (
+					{section.images && (
 						<div
 							class="case__gallery case__gallery--wide"
-							style={section.images ? `--gallery-cols-wide: ${section.images.length === 1 ? 1 : 2}` : undefined}
+							style={`--gallery-cols-wide: ${section.images.length === 1 ? 1 : 2}`}
 						>
-							{section.images?.map((image) => {
+							{section.images.map((image) => {
 								// opt-in browser-chrome bar above a landscape screenshot, same
 								// idea as the phone bezel above: reads as a browser window
 								// instead of a cropped screenshot
 								const isBrowserFrame = image.frame === 'browser';
+								const isContain = section.imagesFit === 'contain';
+								// same phone/wide auto-classification as the main gallery, for
+								// wordmarks/colour grids/banners that aren't close to 16:10
+								const isPhone =
+									isContain &&
+									(image.box ? image.box === 'phone' : (dims.get(image.src)?.height ?? 0) > (dims.get(image.src)?.width ?? 0));
+								const isWide = isContain && !isPhone;
 								return (
 									<div
 										class:list={[
 											'case__placeholder',
 											'case__placeholder--wide-image',
+											isPhone && 'case__placeholder--contain-phone',
+											isWide && 'case__placeholder--contain-wide',
 											isBrowserFrame && 'case__placeholder--frame-browser',
 										]}
-										style={isBrowserFrame ? undefined : `background:${project.color}`}
+										style={[
+											isWide || isBrowserFrame ? null : `background:${project.color}`,
+											(image.span === 'full' || image.span === 'centered') ? 'grid-column: 1 / -1' : null,
+											image.span === 'centered' ? 'max-width: 70%; margin: 0 auto;' : null,
+										]
+											.filter(Boolean)
+											.join('; ') || undefined}
 									>
 										{isBrowserFrame && (
 											<div class="case__browser-bar" aria-hidden="true">
@@ -202,6 +200,23 @@ const dims = new Map(
 									</div>
 								);
 							})}
+						</div>
+					)}
+					{section.video && (
+						<div class="case__video">
+							<video
+								src={section.video.src}
+								aria-label={section.video.description}
+								autoplay
+								muted
+								loop
+								playsinline
+							/>
+							{section.video.controls && (
+								<button type="button" class="case__video-toggle" data-state="playing" aria-label="Pause video">
+									<span class="case__video-toggle-icon" aria-hidden="true" />
+								</button>
+							)}
 						</div>
 					)}
 				</section>
@@ -306,6 +321,20 @@ const dims = new Map(
 		height: 100%;
 		object-fit: cover;
 		object-position: center 35%;
+		border-radius: 20px;
+	}
+
+	/* for a cover graphic that already carries its own full-bleed background
+	   (e.g. a brand asset designed on solid black) — no added colour behind
+	   it, no forced crop, just the image at its own natural aspect ratio */
+	.case__cover--flush {
+		height: auto;
+	}
+
+	.case__cover--flush img {
+		width: 100%;
+		height: auto;
+		object-fit: contain;
 		border-radius: 20px;
 	}
 
@@ -447,11 +476,36 @@ const dims = new Map(
 		border-radius: 20px;
 	}
 
+	.case__placeholder--wide {
+		height: 340px;
+		margin-top: 32px;
+	}
+
+	.case__gallery--wide {
+		grid-template-columns: repeat(var(--gallery-cols-wide, 2), 1fr);
+	}
+
+	.case__placeholder--wide-image {
+		height: auto;
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+	}
+
+	.case__placeholder--wide-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: top;
+		border-radius: 20px;
+	}
+
 	/* for screenshots whose aspect ratio doesn't suit a landscape cover-crop:
 	   a cover-crop would cut content off, so show the whole image instead.
 	   Phone UI (portrait) reads best centered in a framed box; a desktop/web
 	   screenshot (landscape) gets no frame at all, matching every other web
-	   screenshot on the site. */
+	   screenshot on the site. Declared after --image/--wide-image so these
+	   modifiers win regardless of which gallery (main or extraSections)
+	   applies them alongside that base class. */
 	.case__placeholder--contain-phone {
 		height: 480px;
 		aspect-ratio: auto;
@@ -481,35 +535,14 @@ const dims = new Map(
 
 	.case__placeholder--contain-wide {
 		height: auto;
+		aspect-ratio: auto;
+		overflow: visible;
 		background: transparent;
 	}
 
 	.case__placeholder--contain-wide img {
 		width: 100%;
 		height: auto;
-	}
-
-	.case__placeholder--wide {
-		height: 340px;
-		margin-top: 32px;
-	}
-
-	.case__gallery--wide {
-		grid-template-columns: repeat(var(--gallery-cols-wide, 2), 1fr);
-	}
-
-	.case__placeholder--wide-image {
-		height: auto;
-		aspect-ratio: 16 / 10;
-		overflow: hidden;
-	}
-
-	.case__placeholder--wide-image img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: top;
-		border-radius: 20px;
 	}
 
 	/* semi-realistic browser mockup: a chrome bar (traffic-light dots) above

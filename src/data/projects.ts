@@ -7,6 +7,20 @@ interface ImageEntry {
 	// and never set this on an image that's already a photographic mockup
 	// (e.g. a rendered phone-in-a-scene) since it would double up the frame.
 	frame?: 'phone' | 'browser';
+	// full: in a multi-image gallery, span the full row width instead of
+	// sharing a column with the next image (e.g. a wide banner that should
+	// sit on its own line above a pair of smaller images).
+	// centered: same full-row placement, but capped to a narrower max-width
+	// and centered, for a hero screenshot that should read as emphasized
+	// without rendering at a pixelated, oversized blow-up of its source.
+	span?: 'full' | 'centered';
+	// overrides the auto phone/wide box classification (normally based on
+	// the image's own width vs height). Needed for a phone mockup shot at a
+	// tilted angle, which can come out landscape-shaped overall even though
+	// it's conceptually a phone screenshot — without this it gets treated as
+	// a wide desktop screenshot and stretched edge-to-edge instead of sitting
+	// in the smaller, padded phone box.
+	box?: 'phone' | 'wide';
 }
 
 export interface Project {
@@ -27,14 +41,19 @@ export interface Project {
 	color: string; // stack card background
 	nameColor: string; // project name overlay color
 	images?: {
-		cover: ImageEntry;
+		// optional: omit entirely when the case study doesn't need a top
+		// hero image (e.g. the main gallery below already carries the visuals)
+		cover?: ImageEntry;
 		// 'cover' is for a cover image that's already a composed photographic
 		// mockup (e.g. a phone rendered in a real scene) — it drops the
 		// brand-color letterbox and crops to a wide, frameless panorama
 		// instead of containing the whole photo inside a colored box.
+		// 'flush' is for a graphic that already carries its own full-bleed
+		// background (e.g. a brand asset designed on solid black) — no crop,
+		// no added colour, so its own background is the only one visible.
 		// Default ('contain') suits a plain app/site screenshot, which
 		// still wants the colored box as a backdrop around it.
-		coverFit?: 'contain' | 'cover';
+		coverFit?: 'contain' | 'cover' | 'flush';
 		process: ImageEntry[];
 		// 'contain' for portrait screenshots (e.g. phone UI) that would
 		// otherwise get cropped by the gallery's default landscape cover-crop
@@ -44,6 +63,12 @@ export interface Project {
 		title: string;
 		description: string;
 		images?: ImageEntry[];
+		// default 'cover' does a 16:10 crop, same as the main gallery — fine
+		// for screenshots already close to that ratio. 'contain' switches to
+		// the same phone/wide auto-classification the main gallery uses, for
+		// wordmarks, colour grids, or banners that aren't close to 16:10 and
+		// would otherwise get cropped down to a sliver.
+		imagesFit?: 'cover' | 'contain';
 		// controls: adds a minimal pause/play button — reserve for videos long
 		// enough (WCAG 2.2.2, >5s) that autoplay-loop needs a way to stop
 		video?: { src: string; description: string; controls?: boolean };
@@ -57,8 +82,8 @@ export const projects: Project[] = [
 		category: 'Security Platform',
 		year: '2025',
 		client: 'novosafe',
-		role: 'UX/UI Web Designer (Freelance)',
-		tools: 'Figma, Framer',
+		role: 'UX/UI & Brand Designer (Freelance)',
+		tools: 'Figma, Framer, Illustrator',
 		tagline: 'Security Dashboard Redesign',
 		summary:
 			'A B2B security platform helping multi-location businesses arm, monitor, and manage their sites from one app.',
@@ -72,26 +97,60 @@ export const projects: Project[] = [
 		nameColor: '#8fb8ff',
 		images: {
 			cover: {
-				src: '/images/novosafe/home.webp',
-				alt: "Novosafe app home screen showing an armed status message, a Berlin store location, and a large arm/disarm control with an SOS button.",
+				src: '/images/novosafe/app-b2b-arm-disarm.webp',
+				alt: "Novosafe B2B app screen showing 'Ihr Standort ist geschützt' with an arm/disarm control and an SOS button, next to the same screen in its disarmed, green state.",
 			},
 			process: [
 				{
-					src: '/images/novosafe/home.webp',
-					alt: "Novosafe app home screen showing an armed status message, a Berlin store location, and a large arm/disarm control with an SOS button.",
+					src: '/images/novosafe/app-b2b-arm-disarm.webp',
+					alt: "Novosafe B2B app screen showing 'Ihr Standort ist geschützt' with an arm/disarm control and an SOS button, next to the same screen in its disarmed, green state.",
 				},
 				{
-					src: '/images/novosafe/locations.webp',
-					alt: 'Novosafe app locations list for a chain retailer, showing 44 sites with individual arm/disarm toggles, search, and filters.',
+					src: '/images/novosafe/app-b2b-locations.webp',
+					alt: 'Novosafe B2B app location picker listing chain-retail sites with their arm status, next to the arm/disarm screen for the selected location.',
 				},
 			],
 			processFit: 'contain',
 		},
 		extraSections: [
 			{
+				title: 'Brand & identity',
+				description:
+					"Before the product had a single screen, I designed novosafe's logo from zero: a monogram built from two angled strokes that read at once as the initial and an upward, protective arc. Alongside it I set the colour palette and launch collateral that carried the brand across the website, the app, and print. Navy reads as the more technical, professional side, so it carries the B2B identity. Green reads warmer and closer to home, so it carries the B2C one.",
+				imagesFit: 'contain',
+				images: [
+					{
+						src: '/images/novosafe/brand-wordmark.webp',
+						alt: "novosafe's primary mark: a navy monogram of two angled strokes reading as the initial and an upward arc, next to the 'novosafe' wordmark.",
+					},
+					{
+						src: '/images/novosafe/brand-colors.webp',
+						alt: 'Four colour variants of the novosafe mark: navy for the primary B2B identity, green for B2C, yellow for stickers, and a reversed white-on-navy version.',
+					},
+					{
+						src: '/images/novosafe/google-ad.webp',
+						alt: "A novosafe Google Ads creative over a photo of a house lit up at dusk, with the headline 'Ihr Zuhause. Sicher wie nie.', the logo in the corner, and a call to action reading 'Mehr erfahren über unseren smarten Einbruchschutz'.",
+						span: 'full',
+					},
+				],
+			},
+			{
 				title: 'The original consumer app',
 				description:
 					'Before the B2B pivot, I designed the MVP for individual homeowners: device monitoring with live status, and on-demand snapshots from any connected sensor or camera.',
+				imagesFit: 'contain',
+				images: [
+					{
+						src: '/images/novosafe/app-b2c-arm-disarm.webp',
+						alt: "Two consumer app screens: 'Ihr Zuhause ist geschützt' in blue when armed, and 'Ihr Zuhause ist offen' in green when disarmed, each with arm, disarm, and night-mode controls.",
+						box: 'phone',
+					},
+					{
+						src: '/images/novosafe/app-b2c-rooms.webp',
+						alt: 'Consumer app home screen next to a Rooms screen listing connected devices grouped by room.',
+						box: 'phone',
+					},
+				],
 				video: {
 					src: '/images/novosafe/b2c-snapshot-demo.mp4',
 					description:
@@ -102,13 +161,36 @@ export const projects: Project[] = [
 			{
 				title: 'The marketing website',
 				description:
-					"I also designed novosafe's first website in Framer, built around two entry points: one for homes, one for businesses. That business side reflected an earlier, different B2B concept than the one the app has since pivoted to. As a parallel lead-generation initiative, I ran two channel-specific campaigns, one for a community platform (nebenan.de) and one for a national newspaper (FAZ), each testing a channel-matched landing variant against a generic one. In the nebenan.de campaign, the channel-matched design outperformed the generic version: 4.17% vs. 0% conversion (small sample, 47 visits).",
+					"I also designed novosafe's first website in Framer, built around two entry points: one for homes, one for businesses. That business side reflected an earlier, different B2B concept than the one the app has since pivoted to.",
+				imagesFit: 'contain',
+				images: [
+					{
+						src: '/images/novosafe/website-b2b.webp',
+						alt: "novosafe marketing website's business entry point, with the headline 'Ihre Firma - rund um die Uhr geschützt' over a photo of an office hallway.",
+					},
+					{
+						src: '/images/novosafe/website-b2c.webp',
+						alt: "novosafe marketing website's home entry point, its second numbered panel, next to a photo of a family home.",
+					},
+				],
 				video: {
 					src: '/images/novosafe/website-toggle-demo.mp4',
 					description:
 						"Screen recording of the novosafe marketing website stepping through numbered content panels over a photo of a house exterior.",
 					controls: true,
 				},
+			},
+			{
+				title: 'A parallel lead-gen experiment',
+				description:
+					"As a parallel lead-generation initiative for that website, I ran two channel-specific campaigns, one for a community platform (nebenan.de) and one for a national newspaper (FAZ), each testing a channel-matched landing variant against a generic one. nebenan.de's own creative guidelines are explicit about this: address people directly in the informal 'Du', and speak through the brand name rather than 'we', since the ad runs inside their platform, not ours. I rewrote the nebenan.de landing page around both rules: dropped every 'wir', wrote consistently in 'Du', and kept the message focused on what you actually get instead of leading with a pitch. The informal, ad-free variant outperformed the generic one: 6.25% vs. 0% conversion (small sample, directional result).",
+				imagesFit: 'contain',
+				images: [
+					{
+						src: '/images/novosafe/nebenan-ab-test.webp',
+						alt: "Two nebenan.de landing page variants on phones: Variant A written in the informal 'Du', Variant B in the formal 'Sie', both asking what the visitor wants to protect.",
+					},
+				],
 			},
 		],
 	},
@@ -134,9 +216,10 @@ export const projects: Project[] = [
 		nameColor: '#bcd9f2',
 		images: {
 			cover: {
-				src: '/images/novosafe-shop/cover.webp',
-				alt: "Novosafe Shopify store homepage with the headline 'Smarte Sicherheit. Fairer Preis.' over an Ajax security kit, and a four-step buying guide below.",
+				src: '/images/novosafe-shop/home-tablet.webp',
+				alt: "Novosafe Shopify store homepage on a laptop mockup against a grey studio backdrop, with the headline 'Smarte Sicherheit. Fairer Preis.' over an Ajax security kit, and a four-step buying guide below.",
 			},
+			coverFit: 'flush',
 			process: [
 				{
 					src: '/images/novosafe-shop/packages.webp',
@@ -168,6 +251,96 @@ export const projects: Project[] = [
 		],
 	},
 	{
+		slug: 'wocomo',
+		name: 'wocomo',
+		category: 'Brand Identity · Motion Design',
+		year: '2021',
+		client: 'Nikita Ventures GmbH',
+		role: 'Graphic & Motion Designer, Channel Manager',
+		tools: 'Photoshop, After Effects, Premiere, Copywriter',
+		tagline: 'YouTube Network Brand System',
+		summary:
+			'A visual identity and motion system for wocomo, an international YouTube network, built to hold a wide range of subjects under one recognisable brand.',
+		challenge:
+			"wocomo is an international YouTube network spanning a wide range of subjects, from documentaries to travel to music. A different logo for each channel would have splintered that range into unrelated identities, with nothing to tie them together as one brand.",
+		process:
+			"I designed the W// logo and built its colour system around one idea: every channel keeps the same W// mark and takes on its own colour, so the network reads as one recognisable family across a plurality of topics. I also built the motion intro's closing frame in After Effects, reused across the network's video excerpts. Day to day, I ran the content side across several of the network's channels, including wocomoMUSIC, wocomoHUMANITY, WOCOMOdocs, and wocomoTRAVEL: writing titles and descriptions, building each video's thumbnail, deciding publishing schedules, and managing copyright, particularly for music content. I paid close attention to who a video's audience actually was, and adjusted the title, the language, or the timing of its release to reach them.",
+		result:
+			"The W// system now identifies the network across a dozen channels and colours, from wocomoMUSIC to wocomoWILDLIFE. Retitling and relaunching videos to match their real audience, not just their series name, took individual videos to 27 million, 12.6 million, and 8.4 million views.",
+		color: '#021056',
+		nameColor: '#fa1898',
+		images: {
+			process: [
+				{
+					src: '/images/wocomo/brand-wordmark.webp',
+					alt: "wocomo's primary mark: a navy tile with the W// icon, next to the 'wocomo' wordmark in white.",
+				},
+				{
+					src: '/images/wocomo/color-system.webp',
+					alt: 'Twelve colour variants of the W// mark, one per channel: wocomoDOCS, TRAVEL, MUSIC, COOK, HUMANITY, BODY, CULTURE, WILDLIFE, HISTORY, KIDS, MOTORS, and MOVIES.',
+				},
+			],
+			processFit: 'contain',
+		},
+		extraSections: [
+			{
+				title: 'The motion intro',
+				description:
+					"The animation itself: the same closing frame shown above, in motion. Every video excerpt across the network opens with this intro, built in After Effects.",
+				video: {
+					src: '/images/wocomo/intro.mp4',
+					description:
+						"wocomo's brand intro animation: the W// mark builds alongside a row of colour dots and the words 'onderful content in motion', then settles into the plain wocomo wordmark.",
+				},
+			},
+			{
+				title: "Building wocomo's identity",
+				description:
+					"A few examples of that system at work: thumbnails and a channel banner built from the same template, applied consistently across different videos and channels.",
+				imagesFit: 'contain',
+				images: [
+					{
+						src: '/images/wocomo/yt-banner.webp',
+						alt: "wocomoMUSIC's YouTube channel banner: a row of colourful dots on black, with the W//ocomoMUSIC wordmark and the tagline 'Music for Grownups, From Classical to Jazz Music'.",
+						span: 'full',
+					},
+					{
+						src: '/images/wocomo/thumb-culture.webp',
+						alt: 'A wocomoCULTURE video thumbnail with the purple W// badge, over a still of a traditional wrestling match.',
+					},
+					{
+						src: '/images/wocomo/thumb-titan.webp',
+						alt: "A video thumbnail titled 'Settling on Titan' with a teal W// badge, over a render of a dome habitat on an alien landscape.",
+					},
+				],
+			},
+			{
+				title: "Running the network's channels, day to day",
+				description:
+					"Beyond the brand system, I ran the content side of several channels day to day: writing titles and descriptions, building each thumbnail, deciding publishing schedules, and managing copyright. For a video profiling conductor Alondra de la Parra, I titled it in Spanish as well as English from the start, betting there was a Spanish-speaking audience for it, and timed its promotion around Mexico's Independence Day. That paid off: the video has since reached 27 million views, with Spanish-speaking viewers becoming its largest audience segment. A documentary originally titled 'Q'eswachaka: El último puente inca', a name few people outside Peru would recognise, I retitled as 'Comunidades andinas: Cultura y costumbres del Perú más remoto', something a broader audience could actually search for, and released as separate English and Spanish versions. That version reached 8.4 million views. The same logic applied to an episode of Barber Shop, a documentary series about barbershops around the world: retitling it to lead with its actual story rather than just the series name got it far more traction than the original title.",
+				imagesFit: 'contain',
+				images: [
+					{
+						src: '/images/wocomo/thumb-maestra.webp',
+						alt: "wocomoMUSIC thumbnail for 'La Maestra: Alondra de la Parra', titled in Spanish and English, marked at 27 million views.",
+					},
+					{
+						src: '/images/wocomo/thumb-andinas.webp',
+						alt: "wocomoHUMANITY thumbnail for 'Comunidades andinas: Cultura y costumbres del Perú más remoto', marked at 8.4 million views.",
+					},
+					{
+						src: '/images/wocomo/thumb-barbershop.webp',
+						alt: 'A Barber Shop episode thumbnail retitled around its real story, marked at 12.6 million views.',
+					},
+					{
+						src: '/images/wocomo/thumb-brexit.webp',
+						alt: "'Brexit: a divided kingdom' documentary thumbnail, marked at 66.8 thousand views.",
+					},
+				],
+			},
+		],
+	},
+	{
 		slug: 'arbo',
 		name: 'Arbo',
 		category: 'Materials Platform · AI',
@@ -191,29 +364,88 @@ export const projects: Project[] = [
 				src: '/images/arbo/cover.webp',
 				alt: "Arbo login screen on a laptop, with a 'Welcome to Arbo' panel introducing Avi, Arbo's AI, next to the email and password fields.",
 			},
-			process: [
-				{
-					src: '/images/arbo/client-upload.webp',
-					alt: 'Arbo client request flow: a file-upload step for timber lists, specifications, and structural calculations, with a four-step progress tracker.',
-				},
-				{
-					src: '/images/arbo/specialist-offers.webp',
-					alt: "Arbo internal operations dashboard listing supplier offers for an order, grouped by status with requested, approved, rejected, and pending counts.",
-				},
-			],
+			coverFit: 'flush',
+			process: [],
 		},
 		extraSections: [
+			{
+				title: 'Request management',
+				description:
+					"Every request lands in a queue Arbo's specialists work from directly. Before anything moves forward, it goes through a completeness check across four areas, general information, transport, dates, and any special requirements, flagging what's missing before it's processed. Once a request passes, extraction turns it into a structured materials list, broken down by panel type, thickness, surface quality and area, each row carrying its own AI confidence score, so specialists can see at a glance which figures to trust and which to double check before quoting.",
+				images: [
+					{
+						src: '/images/arbo/request-queue.webp',
+						alt: "Arbo request detail view: general information, a completeness-check tracker across four areas, and the AI-extracted quantities panel.",
+						span: 'centered',
+					},
+					{
+						src: '/images/arbo/completeness-check.webp',
+						alt: 'Arbo completeness check dialog, stepping through general information, transport information, dates, and other details for a request.',
+					},
+					{
+						src: '/images/arbo/ai-extracted-list.webp',
+						alt: "Arbo's AI-extracted quantities panel: total area, average category and thickness, and total volume broken down by quality grade.",
+					},
+				],
+			},
+			{
+				title: 'Order management',
+				description:
+					"Once a request is approved, it becomes an order specialists track through its own pipeline: sent to experts, assigned, sent to suppliers, and through to an offer sent back to the client. Each order carries an automatic summary of its documents, generated by the same AI that extracts the materials list, along with customer and delivery details at a glance, and a record of every supplier consulted, tracked by whether they've opened the request and the status of their quote. Once offers come back, specialists filter and compare them by price and delivery date before sending the best ones on to the client.",
+				images: [
+					{
+						src: '/images/arbo/orders-dashboard.webp',
+						alt: 'Arbo order detail view with its approval pipeline (Approve, Send to Experts, Assign, Send to Suppliers, Offer received, Send offers to client) and attached documents.',
+						span: 'centered',
+					},
+					{
+						src: '/images/arbo/consulted-suppliers.webp',
+						alt: 'Arbo consulted suppliers list for an order, each with its response status.',
+					},
+					{
+						src: '/images/arbo/offer-comparison.webp',
+						alt: 'Arbo offer comparison view, showing supplier quotes side by side for the same order.',
+					},
+				],
+			},
+			{
+				title: "The client's request flow",
+				description:
+					"Clients get the simpler side of that same flow: upload the files for a request, fill in delivery details while Avi extracts a dimensions-based summary in the background, then review and download the generated list once it's ready. Specialists work from a fuller version of that same extraction internally, the confidence-scored breakdown above, which is what actually drives the quote.",
+				images: [
+					{
+						src: '/images/arbo/client-flow-upload.webp',
+						alt: 'Arbo client request flow, upload step: a drag-and-drop area for timber lists, specifications, and structural calculations.',
+					},
+					{
+						src: '/images/arbo/client-flow-delivery-details.webp',
+						alt: 'Arbo client request flow, delivery details step, with a background extraction progress bar already at 50 percent.',
+					},
+					{
+						src: '/images/arbo/client-flow-processing.webp',
+						alt: "Arbo client request flow's 'Almost Done' waiting screen, with extraction at 90 percent while the client reviews their request.",
+					},
+					{
+						src: '/images/arbo/client-flow-success.webp',
+						alt: "Arbo client request flow's 'Documents Processed Successfully' screen, with a downloadable materials list and order summary.",
+					},
+					{
+						src: '/images/arbo/client-flow-materials-list.webp',
+						alt: 'Arbo materials list preview modal, showing extracted items with their length, width, height, quantity, and total volume.',
+					},
+				],
+			},
 			{
 				title: 'A further exploration: an AI structure editor',
 				description:
 					"Beyond the shipped flow, I explored a more ambitious redesign: a 3D structure editor where AI would flag reliability issues, like beam collisions, directly on the model before a request was ever sent to a supplier. It didn't make it to production, but it shaped how I think about surfacing AI confidence and errors inside complex technical interfaces.",
 				images: [
 					{
-						src: '/images/arbo/exploration-ai-editor.webp',
+						src: '/images/arbo/exploration-ai-analysis.webp',
 						alt: 'AI document-analysis loading screen, extracting material data from an uploaded plan at 76% complete.',
 					},
 					{
-						src: '/images/arbo/exploration-step-guide.webp',
+						src: '/images/arbo/exploration-3d-editor.webp',
 						alt: 'Exploratory 3D structure editor showing a timber roof frame from four angles, with an AI-flagged collision error between a support beam and a crossbeam.',
 					},
 				],
@@ -241,9 +473,10 @@ export const projects: Project[] = [
 		nameColor: '#7fd1de',
 		images: {
 			cover: {
-				src: '/images/ipe-systeme/cover.webp',
-				alt: "IPE Systeme homepage hero over an aerial river landscape photo, with the headline 'Juntos, somos más sostenibles' and a call to request a free water audit.",
+				src: '/images/ipe-systeme/laptop-mockup.webp',
+				alt: "IPE Systeme homepage on a laptop mockup, with the headline 'Juntos, somos más sostenibles' over an aerial river landscape photo and a call to request a free water audit.",
 			},
+			coverFit: 'cover',
 			process: [
 				{
 					src: '/images/ipe-systeme/methodology.webp',
@@ -394,13 +627,18 @@ export const projects: Project[] = [
 		nameColor: '#181611',
 		images: {
 			cover: {
-				src: '/images/runup/home.webp',
-				alt: "RunUp home screen showing today's shift stock status: 9 empty, 6 low, 4 complete, and a restock breakdown by zone.",
+				src: '/images/runup/challenge-mockup.webp',
+				alt: "Three RunUp phone mockups: a shift's stock status and restock list, the home screen tilted in an orange scene, and a picking list with items already checked off.",
 			},
+			coverFit: 'cover',
 			process: [
 				{
 					src: '/images/runup/zone.webp',
 					alt: 'RunUp zone view for a fridge with a Scan button that lets a runner photograph it for an AI-generated stock count, above a list of individual drinks with stock sliders from empty to full.',
+				},
+				{
+					src: '/images/runup/review-count.webp',
+					alt: "RunUp's Review Count screen after a scan: the AI-detected quantity for each product, adjustable before confirming, with a note that nothing is saved yet.",
 				},
 				{
 					src: '/images/runup/picking.webp',
