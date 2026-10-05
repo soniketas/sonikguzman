@@ -257,7 +257,7 @@ export const projects: Project[] = [
 		year: '2021',
 		client: 'Nikita Ventures GmbH',
 		role: 'Graphic & Motion Designer, Channel Manager',
-		tools: 'Photoshop, After Effects, Premiere, Copywriter',
+		tools: 'Photoshop, After Effects, YouTube, Excel',
 		tagline: 'YouTube Network Brand System',
 		summary:
 			'A visual identity and motion system for wocomo, an international YouTube network, built to hold a wide range of subjects under one recognisable brand.',
