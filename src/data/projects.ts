@@ -75,6 +75,16 @@ export interface Project {
 	}[];
 }
 
+// Home page category nav grouping (order + within-group order both matter,
+// hence explicit slug lists rather than deriving from `projects` array order
+// or adding a per-project field — this is the single source of truth for it).
+export const navGroups = [
+	{ name: 'AI', slugs: ['runup', 'arbo'] },
+	{ name: 'Build', slugs: ['novosafe', 'novosafe-shop', 'greta-stefanel', 'dwa-kolory'] },
+	{ name: 'Accessibility', slugs: ['ipe-systeme'] },
+	{ name: 'Graphic and Motion', slugs: ['wocomo'] },
+] as const;
+
 export const projects: Project[] = [
 	{
 		slug: 'novosafe',
@@ -82,7 +92,7 @@ export const projects: Project[] = [
 		category: 'Security Platform',
 		year: '2025',
 		client: 'novosafe',
-		role: 'UX/UI & Brand Designer (Freelance)',
+		role: 'UX/UI & Brand Designer',
 		tools: 'Figma, Framer, Illustrator',
 		tagline: 'Security Dashboard Redesign',
 		summary:
@@ -200,7 +210,7 @@ export const projects: Project[] = [
 		category: 'E-commerce · Direct Sales',
 		year: '2025',
 		client: 'novosafe',
-		role: 'UX/UI Web Designer (Freelance)',
+		role: 'UX/UI Web Designer',
 		tools: 'Shopify',
 		// TEMP placeholder (borrowed from category) — needs Sonia's real tagline
 		tagline: 'Direct-to-Consumer Security Store',
@@ -270,6 +280,11 @@ export const projects: Project[] = [
 		color: '#021056',
 		nameColor: '#fa1898',
 		images: {
+			cover: {
+				src: '/images/wocomo/brand-wordmark.webp',
+				alt: "wocomo's primary mark: a navy tile with the W// icon, next to the 'wocomo' wordmark in white.",
+			},
+			coverFit: 'flush',
 			process: [
 				{
 					src: '/images/wocomo/brand-wordmark.webp',
@@ -362,7 +377,7 @@ export const projects: Project[] = [
 		images: {
 			cover: {
 				src: '/images/arbo/cover.webp',
-				alt: "Arbo login screen on a laptop, with a 'Welcome to Arbo' panel introducing Avi, Arbo's AI, next to the email and password fields.",
+				alt: "Arbo's Log in screen, with a 'Welcome to Arbo' panel introducing Avi, Arbo's AI, next to the email and password fields.",
 			},
 			coverFit: 'flush',
 			process: [],
@@ -458,7 +473,7 @@ export const projects: Project[] = [
 		category: 'Sustainability · Water Management',
 		year: '2023',
 		client: 'IPE Systeme',
-		role: 'UX/UI Web Designer (Freelance)',
+		role: 'UX/UI Web Designer',
 		tools: 'WordPress, Elementor, Astra',
 		tagline: 'Website & Accessibility Redesign',
 		summary:
@@ -495,7 +510,7 @@ export const projects: Project[] = [
 		category: 'E-commerce · Checkout Redesign',
 		year: '2024',
 		client: 'Greta Stefanel',
-		role: 'UX/UI Web Designer (Freelance)',
+		role: 'UX/UI Web Designer',
 		tools: 'WordPress, WooCommerce',
 		// TEMP placeholder (borrowed from category) — needs Sonia's real tagline
 		tagline: 'Single-Item Checkout Redesign',
@@ -532,7 +547,7 @@ export const projects: Project[] = [
 		category: 'E-commerce · Mobile-First Redesign',
 		year: '2024',
 		client: 'Dwa Kolory',
-		role: 'UX/UI Web Designer (Freelance)',
+		role: 'UX/UI Web Designer',
 		tools: 'Webflow',
 		tagline: 'Mobile-First E-Commerce Redesign',
 		summary:

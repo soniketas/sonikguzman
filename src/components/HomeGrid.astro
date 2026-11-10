@@ -1,19 +1,87 @@
 ---
 import type { Project } from '../data/projects';
+import { navGroups } from '../data/projects';
 
 interface Props {
 	projects: Project[];
 }
 const { projects } = Astro.props;
 
+const bySlug = new Map(projects.map((p) => [p.slug, p]));
+
+// These have a dedicated pre-composed circle Sonia designed herself in
+// Figma (file qjNGKpOCPUOe9FWZwWEXKX, frames "RunUp"/"wocomo"/"novosafe"/
+// "IpeSysteme"/"novosafe shopify", node ids 82:36/82:41/82:46/82:37/84:52) —
+// exported at 2x and saved here, used as the orb image directly instead of
+// the rectangular case-study cover.
+const ORB_IMAGE_OVERRIDE: Record<string, string> = {
+	runup: '/images/home-orbs/runup.webp',
+	wocomo: '/images/home-orbs/wocomo.webp',
+	novosafe: '/images/home-orbs/novosafe.webp',
+	'ipe-systeme': '/images/home-orbs/ipe-systeme.webp',
+	'novosafe-shop': '/images/home-orbs/novosafe-shop.webp',
+};
+
+// Card-view-only image overrides, for projects whose real case-study cover
+// doesn't already suit the card's rectangular media panel as-is.
+const CARD_IMAGE_OVERRIDE: Record<string, { src: string; alt: string; bg?: string }> = {
+	novosafe: {
+		src: '/images/home-cards/novosafe-rect.webp',
+		alt: "Novosafe B2B app screens showing 'Ihr Standort ist geschützt' and 'Ihr System ist unscharf' on two phones.",
+		bg: '#13294b',
+	},
+	'novosafe-shop': {
+		src: '/images/home-cards/novosafe-shop-rect.webp',
+		alt: "The Novosafe Shopify store homepage on a laptop, with the headline 'Smarte Sicherheit. Fairer Preis.' over the hardware kit.",
+	},
+	'ipe-systeme': {
+		src: '/images/home-cards/ipe-systeme-rect.webp',
+		alt: "IPE Systeme homepage on a laptop, with the headline 'Juntos, somos más sostenibles' over an aerial river landscape photo.",
+		bg: 'var(--white)',
+	},
+	wocomo: {
+		src: '/images/wocomo/yt-banner.webp',
+		alt: "wocomoMUSIC's YouTube channel banner: a row of colourful dots on black, with the W//ocomoMUSIC wordmark and the tagline 'Music for Grownups, From Classical to Jazz Music'.",
+	},
+};
+
+// Orb-view-only crop tuning for covers that weren't composed for a small
+// circle — `position`/`scale`/`origin` zoom and recenter the source image,
+// `fit`/`bg` switch to a letterboxed contain crop on a sampled backdrop
+// color for images that would otherwise cut off their subject entirely.
+const ORB_IMAGE_FIT: Record<
+	string,
+	{ position?: string; origin?: string; scale?: number; fit?: 'cover' | 'contain'; bg?: string }
+> = {
+	'dwa-kolory': { fit: 'contain', bg: '#d7b78f' },
+	arbo: { fit: 'contain', bg: '#1e261f' },
+};
+
+const realOrbs = navGroups.flatMap((group) =>
+	group.slugs
+		.map((slug) => bySlug.get(slug))
+		.filter((p): p is Project => Boolean(p))
+		.map((project) => ({ kind: 'project' as const, project, category: group.name }))
+);
+
+// Three reserved, empty slots for projects with no real content yet — a
+// plain, clearly-"not real yet" circle/card, no image, no fake description,
+// and not a real link.
+const placeholders = [{ label: 'Coming soon' }, { label: 'Coming soon' }, { label: 'Coming soon' }];
+
+const orbitItems = [...realOrbs, ...placeholders.map((p) => ({ kind: 'placeholder' as const, ...p }))];
+
 // A video Sonia animated herself in Figma (public/videos/shape-abstract.webm)
 // — checked it for real alpha transparency first (ffprobe/ffmpeg extraction
 // showed the alpha channel is 255/fully opaque everywhere, so there's no
 // built-in transparency to rely on). Playback is driven entirely by scroll
-// position on the project grid (see the <script> below) rather than
-// autoplaying/looping on its own — which also sidesteps the "visible jump
-// on loop restart" problem, since scrubbing back and forth never actually
-// crosses the clip's hard start/end seam the way a repeating loop would.
+// position on the project browsing pane (see the first <script> below)
+// rather than autoplaying/looping on its own — which also sidesteps the
+// "visible jump on loop restart" problem, since scrubbing back and forth
+// never actually crosses the clip's hard start/end seam the way a
+// repeating loop would. This mechanism is intentionally untouched by the
+// orbit/cards browsing UI added below it — see that UI's own script block
+// for how it reuses the same scroll position without altering this one.
 ---
 
 <div class="home">
@@ -39,30 +107,149 @@ const { projects } = Astro.props;
 				products. Based in Berlin.
 			</p>
 			<a href="mailto:sonia.guzman.19@gmail.com" class="home__email">sonia.guzman.19@gmail.com</a>
+
+			<div class="home__browser-controls">
+				<nav class="home__categories" aria-label="Project categories">
+					{
+						navGroups.map((group) => (
+							<button type="button" class="category" data-category={group.name}>
+								{group.name}
+							</button>
+						))
+					}
+				</nav>
+				<div class="view-toggle" role="group" aria-label="Project view">
+					<button
+						type="button"
+						class="view-toggle__btn"
+						data-view="orbit"
+						aria-pressed="false"
+						aria-label="Circle view"
+					>
+						<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+							<circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.6" />
+						</svg>
+					</button>
+					<button
+						type="button"
+						class="view-toggle__btn is-active"
+						data-view="cards"
+						aria-pressed="true"
+						aria-label="Card view"
+					>
+						<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+							<rect x="1" y="2" width="12" height="3.5" rx="1" stroke="currentColor" stroke-width="1.6" />
+							<rect x="1" y="8.5" width="12" height="3.5" rx="1" stroke="currentColor" stroke-width="1.6" />
+						</svg>
+					</button>
+				</div>
+			</div>
 		</div>
 	</header>
 
 	<div class="home__scroll">
-		<div class="home__grid" id="home-grid" role="list">
+		<!-- Circle/orbit view: a tall spacer gives this pane real scroll
+		     distance (same pane whose scrollTop already drives the video,
+		     see the first <script> below) while .home__cluster stays
+		     sticky-pinned in the viewport; scrolling both scrubs the video
+		     (unchanged mechanism) and rotates the orbit (new, second
+		     <script> below). Hidden by default — cards is the starting
+		     view, see the view-toggle script. -->
+		<div class="home__orbit-track" id="home-orbit-track">
+			<div class="home__cluster" id="home-cluster" role="list">
+				{
+					orbitItems.map((item, index) => {
+						if (item.kind === 'placeholder') {
+							return (
+								<div class="orb orb--placeholder" style={`--orbit-index:${index}`} aria-hidden="true">
+									<span class="orb__circle orb__circle--placeholder">
+										<span class="orb__soon">{item.label}</span>
+									</span>
+								</div>
+							);
+						}
+						const { project, category } = item;
+						const override = ORB_IMAGE_OVERRIDE[project.slug];
+						const cover = override ? { src: override } : project.images?.cover;
+						const fit = ORB_IMAGE_FIT[project.slug];
+						const imgStyle = override
+							? undefined
+							: fit
+								? `object-fit:${fit.fit ?? 'cover'}; object-position:${fit.position ?? 'center'}; transform-origin:${fit.origin ?? 'center'}; transform:scale(${fit.scale ?? 1});`
+								: undefined;
+						const circleBg = fit?.bg ?? project.color;
+						return (
+							<a
+								href={`/work/${project.slug}`}
+								class="orb"
+								role="listitem"
+								data-slug={project.slug}
+								data-category={category}
+								aria-label={`${project.name}, ${project.tagline}`}
+								style={`--orbit-index:${index}; --card-color:${project.color}; --card-name-color:${project.nameColor}`}
+							>
+								<span class="orb__circle" style={`background-color:${circleBg}`}>
+									{cover && (
+										<img src={cover.src} alt="" loading="lazy" decoding="async" style={imgStyle} />
+									)}
+								</span>
+								<span class="orb__label">{project.name}</span>
+							</a>
+						);
+					})
+				}
+			</div>
+		</div>
+
+		<!-- Card view — the default. Normal document flow inside
+		     .home__scroll, same as the plain grid it replaces: its own
+		     stacked height is what gives the pane scroll distance here,
+		     driving the video exactly like before. -->
+		<div class="home__cards" id="home-cards" role="list">
 			{
-				projects.map((project, i) => (
-					<a
-						href={`/work/${project.slug}`}
-						class="cell"
-						role="listitem"
-						data-index={i}
-						aria-label={`${project.name}, ${project.tagline}, ${project.year}`}
-					>
-						<span class="cell__year">{project.year}</span>
-						<div class="cell__tags">
-							{project.tools.split(',').map((tool) => (
-								<span class="pill cell__tag">{tool.trim()}</span>
-							))}
+				realOrbs.map(({ project, category }) => {
+					const cover = CARD_IMAGE_OVERRIDE[project.slug] ?? project.images?.cover;
+					const coverBg = cover && 'bg' in cover ? cover.bg : undefined;
+					return (
+						<a
+							href={`/work/${project.slug}`}
+							class="proj-card"
+							role="listitem"
+							data-category={category}
+							style={`--card-color:${project.color}`}
+						>
+							<div class="proj-card__text">
+								<span class="proj-card__eyebrow">{project.client}</span>
+								<h3 class="proj-card__title">{project.tagline}</h3>
+								<div class="proj-card__tags">
+									<span class="proj-card__tag">
+										<span class="proj-card__dot" />
+										{project.role}
+									</span>
+								</div>
+							</div>
+							<div class="proj-card__media" style={coverBg ? `background:${coverBg}` : undefined}>
+								{cover && (
+									<img
+										src={cover.src}
+										alt={cover.alt}
+										loading="lazy"
+										decoding="async"
+										style={coverBg ? 'object-fit: contain;' : undefined}
+									/>
+								)}
+							</div>
+						</a>
+					);
+				})
+			}
+			{
+				placeholders.map((item) => (
+					<div class="proj-card proj-card--placeholder" aria-hidden="true">
+						<div class="proj-card__text">
+							<span class="proj-card__soon">{item.label}</span>
 						</div>
-						<div class="cell__title">
-							<h2 class="cell__name">{project.name}</h2>
-						</div>
-					</a>
+					</div>
 				))
 			}
 		</div>
@@ -163,7 +350,9 @@ const { projects } = Astro.props;
 	   taller centered box extends further in both directions from the same
 	   center point. The email lives inside this same box (in normal flow,
 	   right after the bio) rather than getting its own separate fixed
-	   offset, precisely to avoid that bug recurring a third time. */
+	   offset, precisely to avoid that bug recurring a third time. The
+	   category/view-toggle browsing controls (new) join it the same way,
+	   right after the email, rather than their own fixed offset too. */
 	.home__contact {
 		position: absolute;
 		top: calc(40% + 38px);
@@ -218,147 +407,342 @@ const { projects } = Astro.props;
 		color: var(--gray);
 	}
 
+	/* Category filter + orbit/cards view toggle — sits in the same glow
+	   box as the rest of .home__contact (inherits its ::before backdrop),
+	   scaled down from the original full-bleed design's much larger
+	   display-font category list, since here it shares a compact column
+	   with the role/bio text rather than floating alone over the video. */
+	.home__browser-controls {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-top: 4px;
+	}
+
+	.home__categories {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px 14px;
+	}
+
+	.category {
+		appearance: none;
+		border: none;
+		background: transparent;
+		font-family: var(--font-body);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.02em;
+		color: var(--gray);
+		padding: 2px 0;
+		cursor: pointer;
+		transition: color 0.18s ease;
+	}
+
+	.category:hover,
+	.category:focus-visible {
+		color: var(--ink);
+	}
+
+	.category.is-active {
+		color: #1c22a8;
+	}
+
+	.view-toggle {
+		display: flex;
+		gap: 4px;
+		padding: 3px;
+		border-radius: 20px;
+		background: color-mix(in srgb, var(--white) 70%, transparent);
+		border: 1px solid var(--border);
+		flex-shrink: 0;
+	}
+
+	.view-toggle__btn {
+		appearance: none;
+		border: none;
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		color: var(--gray);
+		cursor: pointer;
+		transition: background 0.18s ease, color 0.18s ease;
+	}
+
+	.view-toggle__btn:hover,
+	.view-toggle__btn:focus-visible {
+		color: var(--ink);
+	}
+
+	.view-toggle__btn.is-active {
+		background: #1c22a8;
+		color: var(--white);
+	}
+
 	/* This pane owns its own scroll — the left identity column stays static
-	   the whole time, only the projects scroll. */
+	   the whole time, only the projects scroll. Untouched from the plain
+	   grid this replaces: the scroll-sync script (first <script> below)
+	   reads this element's scrollTop/scrollHeight exactly as before,
+	   regardless of whether .home__orbit-track or .home__cards is what's
+	   currently providing that scrollable height. */
 	.home__scroll {
 		height: 100%;
 		overflow-y: auto;
 		padding: var(--margin);
 	}
 
-	/* Real gaps between cards instead of hairline dividers — the old
-	   background-color-as-grout trick only worked at gap:1px; at a visible
-	   gap the "background" would just show through as a solid-colored
-	   backdrop between cards instead of the page's own background. */
-	.home__grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+	/* Orbit view ------------------------------------------------------- */
+
+	.home__orbit-track {
+		display: none;
+		/* Scroll distance for a full rotation — tall enough that scrubbing
+		   through it also gives the scroll-synced video plenty of travel,
+		   same as the old grid's own stacked-row height did. */
+		height: 320vh;
+		position: relative;
+	}
+
+	.home.view-orbit .home__orbit-track {
+		display: block;
+	}
+
+	.home.view-orbit .home__cards {
+		display: none;
+	}
+
+	/* Pinned in view for the whole scroll journey (the track above it is
+	   far taller) while scrollTop keeps advancing — that advancing
+	   scrollTop is what both the video-sync script and this component's
+	   own rotation script read from, so nothing here ever needs its own
+	   scroll/wheel listener that could compete with the video's. */
+	.home__cluster {
+		position: sticky;
+		top: 0;
+		height: min(620px, 68vh);
+		overflow: visible;
+		--orbit-size: clamp(120px, 10vw, 190px);
+	}
+
+	.orb {
+		position: absolute;
+		/* left/top are set directly (in px) by the script on every scroll
+		   update, not computed from a CSS custom property — simpler than
+		   round-tripping trig through calc()/sin()/cos(). */
+		width: var(--orbit-size);
+		transform: translate(-50%, -50%);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		-webkit-tap-highlight-color: transparent;
+		transition: opacity 0.25s ease, transform 0.25s ease;
+	}
+
+	.orb:hover,
+	.orb:focus-visible {
+		transform: translate(-50%, -50%) scale(1.06);
+	}
+
+	.orb.is-dimmed {
+		opacity: 0.28;
+	}
+
+	.orb__circle {
+		display: block;
+		width: 100%;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		overflow: hidden;
+		box-shadow: 0 10px 24px rgba(20, 20, 20, 0.18);
+	}
+
+	.orb__circle img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.orb:focus-visible {
+		outline: none;
+	}
+
+	.orb:focus-visible .orb__circle {
+		box-shadow: 0 0 0 3px var(--card-name-color), 0 10px 24px rgba(20, 20, 20, 0.18);
+	}
+
+	/* Hidden at rest — a 120–190px circle can't hold a title + tags
+	   legibly, so the name only appears on hover/focus instead. */
+	.orb__label {
+		margin-top: 10px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		color: var(--ink);
+		background: color-mix(in srgb, var(--white) 85%, transparent);
+		padding: 4px 12px;
+		border-radius: 20px;
+		white-space: nowrap;
+		opacity: 0;
+		transform: translateY(-4px);
+		transition: opacity 0.18s ease, transform 0.18s ease;
+		pointer-events: none;
+	}
+
+	.orb:hover .orb__label,
+	.orb:focus-visible .orb__label {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.orb--placeholder {
+		cursor: default;
+	}
+
+	.orb__circle--placeholder {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: color-mix(in srgb, var(--white) 55%, transparent);
+		border: 1.5px dashed color-mix(in srgb, var(--ink) 35%, transparent);
+		box-shadow: none;
+	}
+
+	.orb__soon {
+		font-family: var(--font-body);
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--ink) 55%, transparent);
+		text-align: center;
+		padding: 0 10%;
+	}
+
+	/* Card view ---------------------------------------------------------
+	   Default view — normal document flow inside .home__scroll, same role
+	   the old .home__grid played: its own stacked height is what the
+	   scroll-sync script measures. */
+
+	.home__cards {
+		display: flex;
+		flex-direction: column;
 		gap: 20px;
 	}
 
-	/* Taller than before (was 3:2) — also means each row takes up more
-	   vertical space, so the pane needs more scroll distance to reach the
-	   bottom, giving the scroll-scrubbed video more room to play through. */
-	.cell {
-		position: relative;
-		display: block;
-		aspect-ratio: 1 / 1;
-		padding: clamp(14px, 1.8vw, 22px);
+	.proj-card {
+		display: flex;
+		flex-shrink: 0;
+		height: 320px;
 		background: var(--white);
 		color: var(--ink);
-		/* a faint tint of the video's accent blue instead of a neutral
-		   gray — ties the grid back to the animation without being loud
-		   about it */
-		border: 1px solid color-mix(in srgb, #1c22a8 12%, var(--border));
-		/* sharp 90° corners on a plain-bordered rectangle is exactly what
-		   reads as an unfinished wireframe — rounding them is one of the
-		   simplest ways to make it feel like a finished surface instead */
-		border-radius: 14px;
-		/* a soft shadow gives the card real depth/weight instead of just a
-		   flat outline — the other half of what was making it read as a
-		   wireframe rather than a finished surface */
+		text-decoration: none;
+		border: 1px solid var(--border);
+		border-radius: 18px;
+		overflow: hidden;
 		box-shadow: 0 1px 3px rgba(20, 20, 20, 0.04), 0 8px 20px rgba(0, 22, 90, 0.06);
-		transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
-		/* mobile browsers overlay their own translucent gray tap-highlight on
-		   top of whatever :active/:hover renders — kill it so a tap shows our
-		   real black active state instead of a washed-out gray flash */
-		-webkit-tap-highlight-color: transparent;
+		transition: opacity 0.25s ease, box-shadow 0.18s ease;
 	}
 
-	/* Hover/active/focus now inverts to the same accent blue as the video
-	   (was plain black) — the one moment this monochrome grid gets color
-	   is the moment you're actively engaging with a project. */
-	.cell:hover,
-	.cell:active,
-	.cell:focus-visible {
-		background: #1c22a8;
-		color: var(--white);
-		/* a slight lift on interaction, echoing the card's own resting
-		   shadow but stronger and blue-tinted to match the new fill */
-		box-shadow: 0 10px 28px rgba(28, 34, 168, 0.28);
-		/* without this, the focus ring's box-shadow on the shared edge with
-		   the next cell in DOM order gets painted over by that sibling,
-		   since plain grid items stack in DOM order, not by who's focused */
-		z-index: 1;
+	.proj-card:hover,
+	.proj-card:focus-visible {
+		box-shadow: 0 10px 28px rgba(20, 20, 20, 0.16);
 	}
 
-	.cell:focus-visible {
-		box-shadow: 0 0 0 5px #1c22a8;
+	.proj-card.is-dimmed {
+		display: none;
 	}
 
-	.cell:hover .cell__year,
-	.cell:active .cell__year,
-	.cell:focus-visible .cell__year {
-		color: rgb(255 255 255 / 65%);
+	.proj-card__text {
+		flex: 1 1 42%;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		padding: clamp(20px, 2.4vw, 36px);
 	}
 
-	.cell:hover .cell__tag,
-	.cell:active .cell__tag,
-	.cell:focus-visible .cell__tag {
-		background: var(--white);
-		color: var(--ink);
-	}
-
-	.cell__year {
-		position: absolute;
-		top: clamp(16px, 2.2vw, 28px);
-		right: clamp(16px, 2.2vw, 28px);
+	.proj-card__eyebrow {
 		font-size: 12px;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 		color: var(--gray);
-		font-family: var(--font-body);
 	}
 
-	/* pinned to the same bottom offset in every cell, regardless of how many
-	   tags sit above it and how many lines they wrap to — this is what keeps
-	   every title at the same height across the whole grid */
-	.cell__title {
-		position: absolute;
-		left: clamp(16px, 2.2vw, 28px);
-		right: clamp(16px, 2.2vw, 28px);
-		bottom: clamp(16px, 2.2vw, 28px);
-	}
-
-	.cell__name {
+	.proj-card__title {
 		font-family: var(--font-display);
 		font-weight: 700;
-		font-size: clamp(18px, 2vw, 24px);
+		font-size: clamp(18px, 1.8vw, 24px);
 		letter-spacing: -0.01em;
-		line-height: 1.1;
+		line-height: 1.2;
 		margin: 0;
 	}
 
-	.cell__tags {
+	.proj-card__tags {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 6px;
-		/* clears the absolutely-positioned year label in the opposite corner */
-		padding-right: 46px;
+		gap: 6px 16px;
+		margin-top: 4px;
 	}
 
-	.cell__tag {
-		/* overrides the shared .pill's lime fill — this screen is monochrome,
-		   no brand color accents, so tags read as a plain outlined label */
-		background: transparent;
-		border: 1px solid var(--ink);
+	.proj-card__tag {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 13px;
 		color: var(--ink);
-		padding: 3px 9px;
-		font-size: 9px;
-		/* Without this, a longer tag like "Claude (vision)" wraps its own
-		   text into two lines at narrow widths (375px, e.g. iPhone SE) —
-		   the pill itself should never break internally; if it doesn't
-		   fit, it wraps as a whole to the next row instead (handled by
-		   flex-wrap on .cell__tags), not mid-word. */
-		white-space: nowrap;
+	}
+
+	.proj-card__dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: var(--card-color);
+		flex-shrink: 0;
+	}
+
+	.proj-card__media {
+		flex: 1 1 58%;
+		position: relative;
+		background: var(--card-color);
+	}
+
+	.proj-card__media img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.proj-card--placeholder {
+		border-style: dashed;
+		border-color: color-mix(in srgb, var(--ink) 35%, transparent);
+		box-shadow: none;
+	}
+
+	.proj-card--placeholder .proj-card__text {
+		align-items: center;
+		justify-content: center;
+	}
+
+	.proj-card__soon {
+		font-family: var(--font-body);
+		font-size: 12px;
+		font-weight: 500;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--ink) 55%, transparent);
 	}
 
 	/* At this in-between width, the wider left identity column leaves the
-	   2-column grid narrow enough that projects with 4-5 tools wrap tags to
-	   enough rows to collide with the bottom-anchored title. A square cell
-	   has enough extra height to clear it here without changing anything
-	   above 1100px, where the default ratio already has enough room. */
+	   right pane narrow enough to need a little extra breathing room. */
 	@media (min-width: 901px) and (max-width: 1100px) {
-		.cell {
-			aspect-ratio: 1 / 1;
+		.proj-card {
+			flex-direction: column;
+			height: auto;
 		}
 	}
 
@@ -375,17 +759,6 @@ const { projects } = Astro.props;
 		   instead, and .home__id's height would collapse to ~0 since both
 		   children are taken out of flow — switch them back to a normal
 		   top-to-bottom flow here. */
-		/* position:relative (not static) so the video can sit behind the
-		   text as an absolute background, the same relationship desktop
-		   has — the flex column here only governs the IN-FLOW children
-		   (title, contact); an absolutely-positioned child like
-		   .home__mass-frame is excluded from that layout automatically and
-		   just overlays behind them (z-index:0 vs. their z-index:1, set in
-		   the shared base rule). The old approach pushed .home__id down
-		   with padding-top on .home (to clear the fixed nav), which left
-		   the video starting partway down the page instead of true y:0 —
-		   removed, so the video reaches the very top of the screen and
-		   sits behind the nav's own backdrop instead of stopping short of it. */
 		.home__id {
 			position: relative;
 			display: flex;
@@ -396,7 +769,7 @@ const { projects } = Astro.props;
 
 		/* Taller than .home__id's own content (title+bio+contact) on
 		   purpose — .home__id has no overflow:hidden, so this spills past
-		   its bottom edge into the space just above the grid, giving the
+		   its bottom edge into the space just above the cards, giving the
 		   fade room to reach toward it instead of cutting off right at
 		   the text block's own height. */
 		.home__mass-frame {
@@ -432,8 +805,28 @@ const { projects } = Astro.props;
 			right: auto;
 		}
 
+		.home__browser-controls {
+			flex-wrap: wrap;
+		}
+
+		/* Orbit is a desktop-only view (its sticky-scroll geometry assumes
+		   the independent .home__scroll pane desktop has) — on mobile the
+		   toggle is hidden and cards always shows, same as the circle
+		   view simply not existing on the old single grid. */
+		.view-toggle__btn[data-view='orbit'] {
+			display: none;
+		}
+
+		.home__orbit-track {
+			display: none !important;
+		}
+
+		.home__cards {
+			display: flex !important;
+		}
+
 		/* On mobile the whole page scrolls together (identity block, then
-		   the grid) instead of the grid owning an independent scroll pane —
+		   the cards) instead of the pane owning an independent scroll —
 		   matches the reference's mobile pattern of leading with narrative
 		   text before the gallery, not a split-screen layout. */
 		.home__scroll {
@@ -443,51 +836,15 @@ const { projects } = Astro.props;
 			margin-top: 32px;
 		}
 
-		/* A fixed aspect-ratio breaks the moment any project has enough
-		   tags to wrap to 3 rows (RunUp: 6 tags) — the bottom-anchored
-		   title has nowhere to go but overlap them. On mobile there's no
-		   grid of identically-sized cards to keep level with each other
-		   the way desktop does, so height can just be automatic — each
-		   cell grows to fit its own content instead of clipping it. */
-		/* Tighter gap between cards — the freed-up width lets more tags
-		   fit per row before wrapping, so tall outliers like RunUp's 6
-		   tags are less likely in the first place, not just handled
-		   gracefully when they happen. */
-		.home__grid {
-			gap: 10px;
-		}
-
-		.cell {
-			aspect-ratio: auto;
-			min-height: 200px;
-			padding: 16px;
-			display: flex;
+		.proj-card {
 			flex-direction: column;
+			height: auto;
 		}
 
-		.cell__tags {
-			padding-right: 34px;
-		}
-
-		.cell__title {
-			position: static;
-			left: auto;
-			right: auto;
-			bottom: auto;
-			margin-top: auto;
-			padding-top: 16px;
-		}
-
-		.cell__name {
-			font-size: 16px;
-		}
-
-		.cell__tag {
-			font-size: 8px;
-			padding: 3px 8px;
+		.proj-card__media {
+			min-height: 180px;
 		}
 	}
-
 </style>
 
 <script>
@@ -582,5 +939,190 @@ const { projects } = Astro.props;
 		// returns NaN.
 		massVideo.addEventListener('loadedmetadata', syncVideoToScroll);
 	}
+</script>
 
+<script>
+	// Orbit/cards project browser — entirely separate from the video-sync
+	// script above (its own <script> tag, its own scope, no shared
+	// variables), so it can't alter that mechanism even by accident. It
+	// reads the same .home__scroll element's scroll position but only
+	// ever *reads* scrollTop (or calls scrollTo on it) — it never calls
+	// preventDefault on the scroll/wheel itself, so the browser's native
+	// scroll (and the video-sync script's own listener) behave exactly as
+	// they already did before this existed.
+	const homeEl = document.querySelector<HTMLElement>('.home');
+	const scrollPane = document.querySelector<HTMLElement>('.home__scroll');
+	const orbitTrack = document.getElementById('home-orbit-track');
+	const cluster = document.getElementById('home-cluster');
+	const cardsList = document.getElementById('home-cards');
+	const orbitOrbs = Array.from(document.querySelectorAll<HTMLElement>('.orb'));
+	const isMobileLayout = window.matchMedia('(max-width: 900px)').matches;
+
+	// --- View toggle ---------------------------------------------------------
+	const viewButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.view-toggle__btn'));
+	let currentView: 'orbit' | 'cards' = 'cards';
+
+	function setView(view: 'orbit' | 'cards') {
+		currentView = view;
+		homeEl?.classList.toggle('view-orbit', view === 'orbit');
+		cardsList?.setAttribute('aria-hidden', String(view !== 'cards'));
+		for (const btn of viewButtons) {
+			const active = btn.dataset.view === view;
+			btn.classList.toggle('is-active', active);
+			btn.setAttribute('aria-pressed', String(active));
+		}
+		// Switching views changes how much the pane can scroll (the track
+		// vs. the cards list have different heights) — resetting to the
+		// top avoids landing at a scrollTop that's suddenly out of range
+		// (or stuck mid-orbit) for the view just switched to.
+		if (scrollPane) scrollPane.scrollTop = 0;
+	}
+
+	for (const btn of viewButtons) {
+		btn.addEventListener('click', () => setView((btn.dataset.view as 'orbit' | 'cards') ?? 'cards'));
+	}
+
+	// --- Orbit geometry/rotation, driven by scroll position -----------------
+	// Desktop only: relies on .home__scroll being its own independent
+	// scroll pane, which only exists above the 900px breakpoint (see the
+	// CSS). No wheel listener, no preventDefault — rotation is a pure
+	// function of the same scrollTop the video-sync script already reads,
+	// computed here independently.
+	let rotateToCategory: ((category: string) => void) | null = null;
+
+	if (!isMobileLayout && cluster && scrollPane && orbitTrack && orbitOrbs.length > 0) {
+		const count = orbitOrbs.length;
+		const angleStep = (Math.PI * 2) / count;
+		let rotation = 0;
+
+		function getGeometry() {
+			const w = cluster!.clientWidth;
+			const h = cluster!.clientHeight;
+			const radius = Math.max(w, h) * 0.55;
+			const orbRadius = (orbitOrbs[0]?.offsetWidth ?? 0) / 2;
+			const edgeOffset = 24;
+			const centerX = radius + orbRadius + edgeOffset;
+			const centerY = h * 0.5;
+			return { centerX, centerY, radius };
+		}
+
+		function render() {
+			const { centerX, centerY, radius } = getGeometry();
+			orbitOrbs.forEach((orb, i) => {
+				const angle = i * angleStep + rotation;
+				const x = centerX + radius * Math.cos(angle);
+				const y = centerY + radius * Math.sin(angle);
+				orb.style.left = `${x}px`;
+				orb.style.top = `${y}px`;
+			});
+		}
+
+		function trackScrollable() {
+			return Math.max(0, orbitTrack!.offsetHeight - scrollPane!.clientHeight);
+		}
+
+		function updateFromScroll() {
+			if (currentView !== 'orbit') return;
+			const scrollable = trackScrollable();
+			const fraction = scrollable > 0 ? Math.min(1, Math.max(0, scrollPane!.scrollTop / scrollable)) : 0;
+			rotation = fraction * Math.PI * 2;
+			render();
+		}
+
+		let ticking = false;
+		scrollPane.addEventListener(
+			'scroll',
+			() => {
+				if (!ticking) {
+					ticking = true;
+					requestAnimationFrame(() => {
+						ticking = false;
+						updateFromScroll();
+					});
+				}
+			},
+			{ passive: true }
+		);
+
+		render();
+		window.addEventListener('resize', render, { passive: true });
+		document.fonts?.ready.then(render);
+
+		function getFrontAngle() {
+			const { centerX, centerY } = getGeometry();
+			return Math.atan2(cluster!.clientHeight / 2 - centerY, cluster!.clientWidth / 2 - centerX);
+		}
+
+		// Category filter in orbit view: scrolls the pane to whatever
+		// scrollTop produces the rotation that brings the matching orbs'
+		// mean angle to the front — a side effect is the video also moves
+		// to that same point in its scrub range, which is consistent with
+		// how scrolling already drives both at once.
+		rotateToCategory = (category) => {
+			const matching = orbitOrbs.filter((orb) => orb.dataset.category === category);
+			if (matching.length === 0) return;
+			let sumCos = 0;
+			let sumSin = 0;
+			for (const orb of matching) {
+				const angle = orbitOrbs.indexOf(orb) * angleStep;
+				sumCos += Math.cos(angle);
+				sumSin += Math.sin(angle);
+			}
+			const meanAngle = Math.atan2(sumSin, sumCos);
+			const target = getFrontAngle() - meanAngle;
+			const normalized = (((target % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) / (Math.PI * 2);
+			scrollPane!.scrollTo({ top: normalized * trackScrollable(), behavior: 'smooth' });
+		};
+	}
+
+	// --- Category filter ----------------------------------------------------
+	// Click toggles a "committed" category (dims every non-matching orb or
+	// card). Hover previews the same effect but only when nothing is
+	// committed, and reverts on mouseleave. Placeholders have no
+	// data-category and are never dimmed.
+	const categoryButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.category'));
+	const realCategoryOrbs = orbitOrbs.filter((orb) => orb.dataset.category);
+	const cardEls = Array.from(document.querySelectorAll<HTMLElement>('.proj-card'));
+	const realCategoryCards = cardEls.filter((card) => card.dataset.category);
+	let activeCategory: string | null = null;
+
+	function applyFilter(category: string | null) {
+		for (const orb of realCategoryOrbs) {
+			orb.classList.toggle('is-dimmed', category !== null && orb.dataset.category !== category);
+		}
+		for (const card of realCategoryCards) {
+			card.classList.toggle('is-dimmed', category !== null && card.dataset.category !== category);
+		}
+		for (const btn of categoryButtons) {
+			btn.classList.toggle('is-active', btn.dataset.category === category);
+		}
+	}
+
+	for (const btn of categoryButtons) {
+		const category = btn.dataset.category ?? null;
+		btn.addEventListener('click', (event) => {
+			event.stopPropagation();
+			activeCategory = activeCategory === category ? null : category;
+			applyFilter(activeCategory);
+			if (activeCategory === null) return;
+			if (currentView === 'cards') {
+				scrollPane?.scrollTo({ top: 0, behavior: 'smooth' });
+			} else {
+				rotateToCategory?.(activeCategory);
+			}
+		});
+		btn.addEventListener('mouseenter', () => {
+			if (activeCategory === null) applyFilter(category);
+		});
+		btn.addEventListener('mouseleave', () => {
+			if (activeCategory === null) applyFilter(null);
+		});
+	}
+
+	document.addEventListener('click', () => {
+		if (activeCategory !== null) {
+			activeCategory = null;
+			applyFilter(null);
+		}
+	});
 </script>
