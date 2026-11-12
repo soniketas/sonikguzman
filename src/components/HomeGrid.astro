@@ -222,10 +222,7 @@ const orbitItems = [...realOrbs, ...placeholders.map((p) => ({ kind: 'placeholde
 								<span class="proj-card__eyebrow">{project.client}</span>
 								<h3 class="proj-card__title">{project.tagline}</h3>
 								<div class="proj-card__tags">
-									<span class="proj-card__tag">
-										<span class="proj-card__dot" />
-										{project.role}
-									</span>
+									<span class="proj-card__tag">{project.role}</span>
 								</div>
 							</div>
 							<div class="proj-card__media" style={coverBg ? `background:${coverBg}` : undefined}>
@@ -686,7 +683,7 @@ const orbitItems = [...realOrbs, ...placeholders.map((p) => ({ kind: 'placeholde
 		display: flex;
 		flex-wrap: wrap;
 		gap: 6px 16px;
-		margin-top: 4px;
+		margin-top: auto;
 	}
 
 	.proj-card__tag {
@@ -695,14 +692,6 @@ const orbitItems = [...realOrbs, ...placeholders.map((p) => ({ kind: 'placeholde
 		gap: 6px;
 		font-size: 13px;
 		color: var(--ink);
-	}
-
-	.proj-card__dot {
-		width: 7px;
-		height: 7px;
-		border-radius: 50%;
-		background: var(--card-color);
-		flex-shrink: 0;
 	}
 
 	.proj-card__media {
